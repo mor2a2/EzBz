@@ -44,11 +44,13 @@ CREATE TABLE accountants (
 
 ### טבלת coaches (מדריכים)
 ```sql
+-- id נקבע ידנית = auth.uid() של המשתמש שנוצר ב-Supabase Auth בזמן ההזמנה (ראו TODO למטה)
 CREATE TABLE coaches (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  id UUID PRIMARY KEY,
   accountant_id UUID REFERENCES accountants(id),
   name TEXT NOT NULL,
-  phone TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  phone TEXT, -- נאסף מאוחר יותר באונבורדינג
   business_type TEXT DEFAULT 'exempt', -- exempt | licensed
   business_number TEXT,
   status TEXT DEFAULT 'pending', -- pending | active | inactive
@@ -480,6 +482,9 @@ CREATE POLICY "coach_sees_own_data" ON documents
 
 > ⚠️ **TODO קריטי:** מדיניות ה-RLS של מדריך ב-`supabase/schema.sql` מבוססת על `coach_id = auth.uid()`.
 > זה עובד רק אם בזמן ה-signup (יצירת השורה בטבלת `coaches`) נקבע `id` בדיוק שווה ל-`auth.uid()` של המשתמש שנרשם ב-Supabase Auth — **לא** UUID אקראי נפרד שנוצר עצמאית (למשל דרך `gen_random_uuid()` בברירת המחדל של הטבלה). יש לוודא זאת בקוד ה-signup לפני שסומכים על ה-RLS.
+> ✅ מטופל ב-`POST /api/admin/invite-coach` — משתמש ב-`auth.admin.inviteUserByEmail()` ואז יוצר את שורת ה-`coaches` עם אותו `id`.
+>
+> ⚠️ **TODO קריטי נוסף:** ה-endpoint `POST /api/admin/invite-coach` מוגן כרגע רק בקוד סוד זמני (`ADMIN_INVITE_SECRET` ב-`.env.local`), כי עדיין אין Auth אמיתי לרו"ח. **חובה להחליף את זה ב-login/session אמיתי לרו"ח (שלב 2, סעיף 1) לפני כל דיפלוי ל-production** — אחרת כל מי שמכיר/מנחש את הסוד יכול ליצור מדריכים חדשים במערכת דרך מפתח ה-service role.
 
 ### שלב 3 — שכבת הרו"ח
 1. דשבורד עם נתונים אמיתיים

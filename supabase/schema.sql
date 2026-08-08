@@ -12,11 +12,14 @@ CREATE TABLE accountants (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- הערה: id נקבע ידנית (לא gen_random_uuid) כדי שיהיה זהה ל-auth.uid()
+-- של המשתמש שנוצר ב-Supabase Auth בזמן ההזמנה. ראו CLAUDE.md, TODO קריטי (שלב 2 — Auth).
 CREATE TABLE coaches (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  id UUID PRIMARY KEY,
   accountant_id UUID REFERENCES accountants(id),
   name TEXT NOT NULL,
-  phone TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  phone TEXT, -- נאסף מאוחר יותר באונבורדינג, לא בזמן ההזמנה
   business_type TEXT DEFAULT 'exempt', -- exempt | licensed
   business_number TEXT,
   status TEXT DEFAULT 'pending', -- pending | active | inactive
