@@ -478,6 +478,9 @@ CREATE POLICY "coach_sees_own_data" ON documents
 3. middleware לאימות session
 4. redirect אוטומטי לפי סוג משתמש
 
+> ⚠️ **TODO קריטי:** מדיניות ה-RLS של מדריך ב-`supabase/schema.sql` מבוססת על `coach_id = auth.uid()`.
+> זה עובד רק אם בזמן ה-signup (יצירת השורה בטבלת `coaches`) נקבע `id` בדיוק שווה ל-`auth.uid()` של המשתמש שנרשם ב-Supabase Auth — **לא** UUID אקראי נפרד שנוצר עצמאית (למשל דרך `gen_random_uuid()` בברירת המחדל של הטבלה). יש לוודא זאת בקוד ה-signup לפני שסומכים על ה-RLS.
+
 ### שלב 3 — שכבת הרו"ח
 1. דשבורד עם נתונים אמיתיים
 2. פתיחת תיק + שליחת WhatsApp
