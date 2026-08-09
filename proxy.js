@@ -25,15 +25,17 @@ export async function proxy(request) {
 
   // מרענן את ה-session cookie אם צריך; חובה כדי שה-auth cookies לא יפגו
   const pathname = request.nextUrl.pathname;
-  const isAccountantPath = pathname.startsWith('/accountant') && pathname !== '/accountant/login';
+  const requiresAccountant =
+    (pathname.startsWith('/accountant') && pathname !== '/accountant/login') ||
+    pathname.startsWith('/admin');
   const isCoachPath = pathname.startsWith('/coach');
 
-  if (isAccountantPath || isCoachPath) {
+  if (requiresAccountant || isCoachPath) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (isAccountantPath) {
+    if (requiresAccountant) {
       if (!user) {
         return NextResponse.redirect(new URL('/accountant/login', request.url));
       }

@@ -6,7 +6,6 @@ import { useState } from 'react';
 export default function InviteCoachPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [secret, setSecret] = useState('');
   const [status, setStatus] = useState(null);
 
   async function handleSubmit(e) {
@@ -16,7 +15,7 @@ export default function InviteCoachPage() {
     const res = await fetch('/api/admin/invite-coach', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, secret }),
+      body: JSON.stringify({ name, email }),
     });
     const data = await res.json();
 
@@ -44,16 +43,6 @@ export default function InviteCoachPage() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>קוד סוד</label>
-        <br />
-        <input
-          type="password"
-          value={secret}
-          onChange={(e) => setSecret(e.target.value)}
           required
         />
       </div>

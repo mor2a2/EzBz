@@ -1,13 +1,28 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase-ssr';
 
-// זמני: מוגן בקוד סוד בלבד עד שיהיה Auth אמיתי לרו"ח. ראו TODO ב-CLAUDE.md (שלב 2 — Auth).
 export async function POST(request) {
-  const { name, email, secret } = await request.json();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (secret !== process.env.ADMIN_INVITE_SECRET) {
-    return NextResponse.json({ error: 'לא מורשה' }, { status: 401 });
+  if (!user) {
+    return NextResponse.json({ error: 'לא מחובר/ת' }, { status: 401 });
   }
+
+  const { data: accountant } = await supabase
+    .from('accountants')
+    .select('id')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!accountant) {
+    return NextResponse.json({ error: 'אין הרשאה — לא רו"ח מורשה' }, { status: 403 });
+  }
+
+  const { name, email } = await request.json();
 
   if (!name?.trim() || !email?.trim()) {
     return NextResponse.json({ error: 'שם ואימייל הם שדות חובה' }, { status: 400 });

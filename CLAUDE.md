@@ -475,16 +475,14 @@ CREATE POLICY "coach_sees_own_data" ON documents
 5. בדיקה שהחיבור עובד
 
 ### שלב 2 — Auth
-1. לוגין רו"ח (email + password)
-2. לוגין מדריך (phone + password)
-3. middleware לאימות session
-4. redirect אוטומטי לפי סוג משתמש
+1. ✅ לוגין רו"ח — מג'יק לינק באימייל (לא סיסמה), `/accountant/login`
+2. ✅ הזמנת/כניסת מדריך — מג'יק לינק באימייל דרך הזמנת רו"ח (`/api/admin/invite-coach`)
+3. ✅ middleware לאימות session — `proxy.js`, מרענן session ומגן על `/accountant/*`, `/admin/*`, `/coach/*` לפי תפקיד
+4. ✅ redirect אוטומטי לפי סוג משתמש — מטופל ב-`proxy.js`
 
 > ⚠️ **TODO קריטי:** מדיניות ה-RLS של מדריך ב-`supabase/schema.sql` מבוססת על `coach_id = auth.uid()`.
 > זה עובד רק אם בזמן ה-signup (יצירת השורה בטבלת `coaches`) נקבע `id` בדיוק שווה ל-`auth.uid()` של המשתמש שנרשם ב-Supabase Auth — **לא** UUID אקראי נפרד שנוצר עצמאית (למשל דרך `gen_random_uuid()` בברירת המחדל של הטבלה). יש לוודא זאת בקוד ה-signup לפני שסומכים על ה-RLS.
-> ✅ מטופל ב-`POST /api/admin/invite-coach` — משתמש ב-`auth.admin.inviteUserByEmail()` ואז יוצר את שורת ה-`coaches` עם אותו `id`.
->
-> ⚠️ **TODO קריטי נוסף:** ה-endpoint `POST /api/admin/invite-coach` מוגן כרגע רק בקוד סוד זמני (`ADMIN_INVITE_SECRET` ב-`.env.local`), כי עדיין אין Auth אמיתי לרו"ח. **חובה להחליף את זה ב-login/session אמיתי לרו"ח (שלב 2, סעיף 1) לפני כל דיפלוי ל-production** — אחרת כל מי שמכיר/מנחש את הסוד יכול ליצור מדריכים חדשים במערכת דרך מפתח ה-service role.
+> ✅ מטופל ב-`POST /api/admin/invite-coach` — משתמש ב-`auth.admin.inviteUserByEmail()` ואז יוצר את שורת ה-`coaches` עם אותו `id`. ה-endpoint עצמו מוגן בבדיקת session אמיתית מול טבלת `accountants` (לא קוד סוד).
 >
 > ⚠️ **TODO קריטי נוסף — Custom SMTP:** ה-SMTP המובנה (ברירת מחדל) של Supabase מוגבל ל-**2 מיילים לשעה בלבד לכל הפרויקט** (לא רק למסך מסוים). זה עובד לבדיקות אבל **לא מספיק ל-production** — גם login רגיל של רו"ח/מדריכים יתחיל להיכשל אחרי 2 מיילים בשעה. **חובה להגדיר custom SMTP** (למשל SendGrid/Postmark) ב-Supabase Dashboard → Authentication → Email, לפני כל דיפלוי ל-production.
 1. דשבורד עם נתונים אמיתיים
