@@ -484,7 +484,8 @@ CREATE POLICY "coach_sees_own_data" ON documents
 > זה עובד רק אם בזמן ה-signup (יצירת השורה בטבלת `coaches`) נקבע `id` בדיוק שווה ל-`auth.uid()` של המשתמש שנרשם ב-Supabase Auth — **לא** UUID אקראי נפרד שנוצר עצמאית (למשל דרך `gen_random_uuid()` בברירת המחדל של הטבלה). יש לוודא זאת בקוד ה-signup לפני שסומכים על ה-RLS.
 > ✅ מטופל ב-`POST /api/admin/invite-coach` — משתמש ב-`auth.admin.inviteUserByEmail()` ואז יוצר את שורת ה-`coaches` עם אותו `id`. ה-endpoint עצמו מוגן בבדיקת session אמיתית מול טבלת `accountants` (לא קוד סוד).
 >
-> ⚠️ **TODO קריטי נוסף — Custom SMTP:** ה-SMTP המובנה (ברירת מחדל) של Supabase מוגבל ל-**2 מיילים לשעה בלבד לכל הפרויקט** (לא רק למסך מסוים). זה עובד לבדיקות אבל **לא מספיק ל-production** — גם login רגיל של רו"ח/מדריכים יתחיל להיכשל אחרי 2 מיילים בשעה. **חובה להגדיר custom SMTP** (למשל SendGrid/Postmark) ב-Supabase Dashboard → Authentication → Email, לפני כל דיפלוי ל-production.
+> ✅ **Custom SMTP הוגדר** — Resend (`smtp.resend.com`), sender `onboarding@resend.dev`, ב-Supabase Dashboard → Authentication → Email. נבדק בפועל: מייל magic link הגיע בהצלחה לרו"ח, בלי לפגוע במגבלת ה-2/שעה הישנה.
+> ⚠️ **TODO נשאר פתוח:** `onboarding@resend.dev` הוא כתובת ה-sandbox המשותפת של Resend, וייתכן שמוגבלת לשליחה רק לכתובת בעל/ת חשבון ה-Resend. **לפני שמזמינים מדריך אמיתי (לא רק בדיקות עם החשבון של מור) — יש לוודא שהשליחה עובדת לכתובות חיצוניות**, ואם לא: לאמת דומיין משלכם ב-Resend ולעדכן את כתובת השולח בהתאם, לפני כל דיפלוי ל-production.
 1. דשבורד עם נתונים אמיתיים
 2. פתיחת תיק + שליחת WhatsApp
 3. onboarding מדריך (3→4→5)
