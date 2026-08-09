@@ -485,8 +485,8 @@ CREATE POLICY "coach_sees_own_data" ON documents
 > ✅ מטופל ב-`POST /api/admin/invite-coach` — משתמש ב-`auth.admin.inviteUserByEmail()` ואז יוצר את שורת ה-`coaches` עם אותו `id`.
 >
 > ⚠️ **TODO קריטי נוסף:** ה-endpoint `POST /api/admin/invite-coach` מוגן כרגע רק בקוד סוד זמני (`ADMIN_INVITE_SECRET` ב-`.env.local`), כי עדיין אין Auth אמיתי לרו"ח. **חובה להחליף את זה ב-login/session אמיתי לרו"ח (שלב 2, סעיף 1) לפני כל דיפלוי ל-production** — אחרת כל מי שמכיר/מנחש את הסוד יכול ליצור מדריכים חדשים במערכת דרך מפתח ה-service role.
-
-### שלב 3 — שכבת הרו"ח
+>
+> ⚠️ **TODO קריטי נוסף — Custom SMTP:** ה-SMTP המובנה (ברירת מחדל) של Supabase מוגבל ל-**2 מיילים לשעה בלבד לכל הפרויקט** (לא רק למסך מסוים). זה עובד לבדיקות אבל **לא מספיק ל-production** — גם login רגיל של רו"ח/מדריכים יתחיל להיכשל אחרי 2 מיילים בשעה. **חובה להגדיר custom SMTP** (למשל SendGrid/Postmark) ב-Supabase Dashboard → Authentication → Email, לפני כל דיפלוי ל-production.
 1. דשבורד עם נתונים אמיתיים
 2. פתיחת תיק + שליחת WhatsApp
 3. onboarding מדריך (3→4→5)

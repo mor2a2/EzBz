@@ -24,7 +24,56 @@ export async function proxy(request) {
   );
 
   // מרענן את ה-session cookie אם צריך; חובה כדי שה-auth cookies לא יפגו
-  await supabase.auth.getUser();
+  const pathname = request.nextUrl.pathname;
+  const isAccountantPath = pathname.startsWith('/accountant') && pathname !== '/accountant/login';
+  const isCoachPath = pathname.startsWith('/coach');
+
+  if (isAccountantPath || isCoachPath) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (isAccountantPath) {
+      if (!user) {
+        return NextResponse.redirect(new URL('/accountant/login', request.url));
+      }
+      const { data: accountant } = await supabase
+        .from('accountants')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (!accountant) {
+        const { data: coach } = await supabase
+          .from('coaches')
+          .select('id')
+          .eq('id', user.id)
+          .maybeSingle();
+        return NextResponse.redirect(
+          new URL(coach ? '/coach/home' : '/accountant/login', request.url)
+        );
+      }
+    }
+
+    if (isCoachPath && user) {
+      const { data: coach } = await supabase
+        .from('coaches')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (!coach) {
+        const { data: accountant } = await supabase
+          .from('accountants')
+          .select('id')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (accountant) {
+          return NextResponse.redirect(new URL('/accountant/home', request.url));
+        }
+      }
+    }
+  } else {
+    await supabase.auth.getUser();
+  }
 
   return response;
 }
