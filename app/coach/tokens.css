@@ -1,0 +1,48 @@
+/* EzBz — שכבה B (מדריך) design tokens
+   מקור: ezbz_menu (20).html — הכוורת (B0), הקובץ הנעול היחיד בשכבה B
+   שנבנה כרגע בפועל בפלטת הכהה-זהב הזו. שאר קבצי ה-mockup תחת
+   NLP/מסכים אינם משתמשים בפלטה הזו עדיין. */
+
+:root{
+  --coach-bg:#080400;--coach-bg2:#080500;
+  --coach-ink:#E8E0C8;--coach-gold:#C9A84C;--coach-gold-line:#C9A040;--coach-gold-dim:#5A4A28;
+
+  --coach-font:var(--font-heebo),sans-serif;
+
+  /* תא כוורת — מידות ופריסה */
+  --hex-w:148px;--hex-h:170px;
+  --hex-row-overlap:-28px;
+
+  /* תא כוורת — תווית */
+  --hex-label-color:#CCCCCC;--hex-label-size:12.5px;
+  --hex-center-label-color:var(--coach-gold);--hex-center-label-size:13px;
+
+  /* תא כוורת — גוון פנימי (זהה בכל 7 התאים) */
+  --hex-cell-cx:40%;--hex-cell-cy:24%;--hex-cell-r:75%;
+  --hex-cell-stop-0:#E8703A;--hex-cell-stop-20:#C77B1E;--hex-cell-stop-45:#96280E;
+  --hex-cell-stop-72:#5C1206;--hex-cell-stop-100:#200400;
+
+  /* תא כוורת — דופן פנימית (rim) */
+  --hex-rim-stroke:rgba(255,230,195,0.32);--hex-rim-width:1.6;
+
+  /* תא כוורת — הבהוב מרכזי (glint) */
+  --hex-glint-outer-fill:rgba(255,255,238,0.53);--hex-glint-outer-r:5;
+  --hex-glint-inner-fill:rgba(255,255,255,0.68);--hex-glint-inner-r:2.5;
+
+  /* תא כוורת — קווי אייקון */
+  --hex-icon-stroke:rgba(255,235,175,0.85);
+}
+
+/* הערה: wall1..wall7 (הטבעת החיצונית הדקה מסביב לכל תא) עדיין שונה מעט בין
+   התאים — לא אוחדה, כי לא התבקש שינוי בה. רק גוון התא הפנימי (cell1..cell7)
+   אוחד לגמרי לגוון אחד (--hex-cell-*).
+
+   גיאומטריית SVG חוזרת (זהה בכל 7 התאים) — לא ניתנת לביטוי כ-CSS custom property,
+   מתועדת כאן כהפניה לשימוש עתידי בקומפוננטת B0 ב-React:
+
+   hex polygon:  74,2 146,42 146,128 74,168 2,128 2,42
+   blob path:    M74,13 C96,15 133,36 136,53 C140,70 137,101 134,119 C132,134 95,157
+                 73,155 C50,158 15,132 12,117 C9,101 11,67 14,51 C16,36 52,13 74,13 Z
+   rim path:     M74,25 C91,28 117,43 121,57 C124,70 121,101 119,113 C116,127 90,144
+                 73,142 C55,145 31,125 27,113 C24,100 27,68 29,55 C32,42 57,26 74,25 Z
+*/

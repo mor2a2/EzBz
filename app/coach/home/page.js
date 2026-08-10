@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase-ssr';
+import Hive from '../Hive';
 
-// עמוד נחיתה זמני ומינימלי — רק לוודא שה-magic link מוביל לכאן ולא לשגיאה.
-// העיצוב המלא של הכוורת (B0) ייבנה בשלב נפרד.
 export default async function CoachHomePage() {
   const supabase = await createClient();
   const {
@@ -16,15 +15,5 @@ export default async function CoachHomePage() {
     );
   }
 
-  const { data: coach } = await supabase
-    .from('coaches')
-    .select('name')
-    .eq('id', user.id)
-    .single();
-
-  return (
-    <div style={{ padding: 24 }}>
-      <p>ברוך/ה הבא/ה, {coach?.name ?? user.email} — התחברת בהצלחה.</p>
-    </div>
-  );
+  return <Hive />;
 }
