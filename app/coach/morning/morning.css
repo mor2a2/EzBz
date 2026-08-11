@@ -1,0 +1,65 @@
+/* מבנה מ-today_screen (1).html, אבל בגוון משפחת שמפניה-ענבר (app/coach/tokens.css)
+   במקום ה-:root המקורי (ירוק/לבן) של הקובץ הזה — הכרטיס איחד עם רקע העמוד. */
+.morning-root {
+  max-width: 440px;
+  margin: 0 auto;
+  background: var(--work-card-bg);
+  border: 0.5px solid var(--work-card-border);
+  border-radius: 14px;
+  overflow: hidden;
+  color: var(--work-ink);
+}
+
+.m-hdr { background: var(--work-accent); padding: 14px 16px; }
+.m-hdr-greet { font-size: 10px; color: var(--work-accent-pale); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.m-hdr-title { font-size: 18px; font-weight: 600; color: #fff; }
+.m-hdr-date { font-size: 11px; color: var(--work-accent-pale); margin-top: 2px; }
+
+.m-tabs { display: flex; border-bottom: 0.5px solid var(--work-card-border); }
+.m-tab {
+  flex: 1; padding: 10px 4px; font-size: 11px; font-weight: 500; border: none; cursor: pointer;
+  border-bottom: 2px solid transparent; background: transparent; color: var(--work-ink-faint);
+  display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative;
+}
+.m-tab.on { color: var(--work-accent); border-bottom-color: var(--work-accent); }
+.m-tab-badge {
+  position: absolute; top: 6px; left: calc(50% - 18px); width: 7px; height: 7px;
+  border-radius: 50%; background: var(--status-urgent);
+}
+
+.m-meet-card { display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid var(--work-card-border); }
+.m-meet-card:last-child { border-bottom: none; }
+.m-meet-card.next { background: rgba(150,40,14,0.05); }
+.m-meet-time { width: 48px; text-align: center; flex-shrink: 0; margin-left: 12px; }
+.m-meet-time-num { font-size: 15px; font-weight: 700; color: var(--work-accent); }
+.m-meet-time-unit { font-size: 9px; color: var(--work-ink-faint); }
+.m-meet-av {
+  width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; flex-shrink: 0; margin-left: 10px; background: var(--work-accent-pale); color: var(--work-accent);
+}
+.m-meet-info { flex: 1; }
+.m-meet-name { font-size: 13px; font-weight: 500; }
+.m-meet-sub { font-size: 11px; color: var(--work-ink-faint); margin-top: 1px; }
+
+.m-money-lbl {
+  font-size: 9px; font-weight: 600; color: var(--work-ink-faint); text-transform: uppercase;
+  letter-spacing: 0.06em; padding: 9px 16px 5px; background: var(--work-accent-pale);
+}
+.m-money-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid var(--work-card-border); }
+.m-money-row:last-child { border-bottom: none; }
+.m-money-info { flex: 1; }
+.m-money-name { font-size: 12px; font-weight: 500; }
+.m-money-sub { font-size: 10px; color: var(--work-ink-faint); margin-top: 1px; }
+.m-money-amt { font-size: 13px; font-weight: 600; color: var(--status-urgent); }
+.m-money-amt.receipt { color: var(--status-pending); }
+
+.m-comp-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid var(--work-card-border); }
+.m-comp-row:last-child { border-bottom: none; }
+.m-comp-info { flex: 1; }
+.m-comp-name { font-size: 12px; font-weight: 500; }
+.m-comp-sub { font-size: 10px; color: var(--work-ink-faint); margin-top: 1px; }
+.m-comp-type { font-size: 9px; padding: 2px 7px; border-radius: 20px; background: var(--work-accent-pale); color: var(--work-ink-dim); }
+
+.m-empty { padding: 24px 16px; text-align: center; font-size: 12px; color: var(--work-ink-dim); }
+
+.m-back { display: block; text-align: center; padding: 12px; font-size: 12px; color: var(--work-accent); }
