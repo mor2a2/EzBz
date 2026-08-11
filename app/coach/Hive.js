@@ -1,32 +1,6 @@
 import Link from 'next/link';
 import './hive.css';
-
-const BG_W = 1080;
-const BG_H = 832;
-const BG_R = 44;
-
-function buildHexGridPolygons() {
-  const dx = BG_R * Math.sqrt(3);
-  const dy = BG_R * 1.5;
-  const rows = Math.ceil(BG_H / dy) + 2;
-  const cols = Math.ceil(BG_W / dx) + 2;
-  const polygons = [];
-
-  for (let row = -1; row < rows; row++) {
-    const cy = row * dy + BG_R;
-    const offset = row % 2 !== 0 ? dx / 2 : 0;
-    for (let col = -1; col < cols; col++) {
-      const cx = col * dx + offset + BG_R;
-      const pts = [];
-      for (let i = 0; i < 6; i++) {
-        const angle = (Math.PI / 180) * (60 * i - 90);
-        pts.push(`${(cx + BG_R * Math.cos(angle)).toFixed(1)},${(cy + BG_R * Math.sin(angle)).toFixed(1)}`);
-      }
-      polygons.push(pts.join(' '));
-    }
-  }
-  return polygons;
-}
+import { BG_W, BG_H, buildHexGridPolygons } from './hexGrid';
 
 const HEX_POLYGON = '74,2 146,42 146,128 74,168 2,128 2,42';
 const BLOB_PATH =
@@ -45,12 +19,9 @@ function CellGradient({ id, wallStops }) {
           <stop key={offset} offset={offset} stopColor={color} />
         ))}
       </radialGradient>
-      <radialGradient
-        id={`cell${id}`}
-        cx="var(--hex-cell-cx)"
-        cy="var(--hex-cell-cy)"
-        r="var(--hex-cell-r)"
-      >
+      {/* cx/cy/r are gradient geometry, not CSS-stylable — var() would not resolve here.
+          Literal values match --hex-cell-cx/cy/r in tokens.css; keep them in sync. */}
+      <radialGradient id={`cell${id}`} cx="40%" cy="24%" r="75%">
         <stop offset="0%" style={{ stopColor: 'var(--hex-cell-stop-0)' }} />
         <stop offset="20%" style={{ stopColor: 'var(--hex-cell-stop-20)' }} />
         <stop offset="45%" style={{ stopColor: 'var(--hex-cell-stop-45)' }} />
@@ -64,8 +35,8 @@ function CellGradient({ id, wallStops }) {
 function Glint({ cx, cy }) {
   return (
     <>
-      <circle cx={cx} cy={cy} r="var(--hex-glint-outer-r)" style={{ fill: 'var(--hex-glint-outer-fill)' }} />
-      <circle cx={cx} cy={cy} r="var(--hex-glint-inner-r)" style={{ fill: 'var(--hex-glint-inner-fill)' }} />
+      <circle cx={cx} cy={cy} style={{ r: 'var(--hex-glint-outer-r)', fill: 'var(--hex-glint-outer-fill)' }} />
+      <circle cx={cx} cy={cy} style={{ r: 'var(--hex-glint-inner-r)', fill: 'var(--hex-glint-inner-fill)' }} />
     </>
   );
 }
@@ -267,7 +238,14 @@ export default function Hive() {
         xmlns="http://www.w3.org/2000/svg"
       >
         <rect width={BG_W} height={BG_H} fill="var(--coach-bg2)" />
-        <g fill="none" stroke="var(--coach-gold)" strokeOpacity="0.25" strokeWidth="0.7">
+        <g
+          fill="none"
+          style={{
+            stroke: 'var(--coach-gold)',
+            strokeOpacity: 'var(--hex-grid-opacity)',
+            strokeWidth: 'var(--hex-grid-width)',
+          }}
+        >
           {bgPolygons.map((pts) => (
             <polygon key={pts} points={pts} />
           ))}

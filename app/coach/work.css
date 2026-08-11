@@ -1,0 +1,17 @@
+.work-page {
+  font-family: var(--coach-font);
+  direction: rtl;
+  min-height: 100vh;
+  position: relative;
+  color: var(--work-ink);
+}
+
+.work-page a {
+  color: var(--hex-cell-stop-45, #96280E);
+}
+
+.work-content {
+  position: relative;
+  z-index: 5;
+  padding: 24px;
+}

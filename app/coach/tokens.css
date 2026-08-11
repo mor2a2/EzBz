@@ -17,7 +17,10 @@
   --hex-label-color:#CCCCCC;--hex-label-size:12.5px;
   --hex-center-label-color:var(--coach-gold);--hex-center-label-size:13px;
 
-  /* תא כוורת — גוון פנימי (זהה בכל 7 התאים) */
+  /* תא כוורת — גוון פנימי (זהה בכל 7 התאים).
+     cx/cy/r כאן הם תיעוד בלבד — geometry attributes על <radialGradient> אינם
+     CSS-stylable, אז var() לא נפתר שם; ב-Hive.js הם ערכים ליטרליים (40%/24%/75%),
+     תשמרו בסנכרון אם משנים. stop-* כן נצרכים בפועל דרך style={{stopColor:'var(...)'}} */
   --hex-cell-cx:40%;--hex-cell-cy:24%;--hex-cell-r:75%;
   --hex-cell-stop-0:#E8703A;--hex-cell-stop-20:#C77B1E;--hex-cell-stop-45:#96280E;
   --hex-cell-stop-72:#5C1206;--hex-cell-stop-100:#200400;
@@ -31,6 +34,13 @@
 
   /* תא כוורת — קווי אייקון */
   --hex-icon-stroke:rgba(255,235,175,0.85);
+
+  /* רשת משושי רקע — משותפת ל-B0 ולמסכי עבודה, רק גוון הפוך (ר' hex-grid-demo מאושר) */
+  --hex-grid-opacity:0.25;--hex-grid-width:0.7;
+
+  /* מסכי עבודה (B2 ואילך) — ברירת מחדל, מאושר סופית */
+  --work-bg:#E5D5BE;--work-grid-stroke:#B8862E;
+  --work-ink:#2A2013;--work-ink-dim:#6B5A3E;
 }
 
 /* הערה: wall1..wall7 (הטבעת החיצונית הדקה מסביב לכל תא) עדיין שונה מעט בין
