@@ -59,6 +59,14 @@ CREATE TABLE payments (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE groups (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  coach_id UUID REFERENCES coaches(id),
+  name TEXT NOT NULL,
+  schedule_label TEXT, -- טקסט חופשי, לדוגמה "ראשון 10:00"
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE trainees (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   coach_id UUID REFERENCES coaches(id),
@@ -66,7 +74,7 @@ CREATE TABLE trainees (
   age INTEGER,
   area TEXT,
   group_type TEXT DEFAULT 'individual', -- individual | group
-  group_id UUID,
+  group_id UUID REFERENCES groups(id),
   parent_name TEXT,
   parent_phone TEXT,
   parent_consent BOOLEAN DEFAULT FALSE,
@@ -118,6 +126,7 @@ ALTER TABLE coaches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE institutions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE trainees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE progress_stages ENABLE ROW LEVEL SECURITY;
@@ -151,6 +160,13 @@ CREATE POLICY "accountant_sees_own_institutions" ON institutions
     coach_id IN (SELECT id FROM coaches WHERE accountant_id = (SELECT id FROM accountants WHERE email = auth.jwt()->>'email'))
   );
 CREATE POLICY "coach_sees_own_institutions" ON institutions
+  FOR ALL USING (coach_id = auth.uid());
+
+CREATE POLICY "accountant_sees_own_groups" ON groups
+  FOR ALL USING (
+    coach_id IN (SELECT id FROM coaches WHERE accountant_id = (SELECT id FROM accountants WHERE email = auth.jwt()->>'email'))
+  );
+CREATE POLICY "coach_sees_own_groups" ON groups
   FOR ALL USING (coach_id = auth.uid());
 
 CREATE POLICY "accountant_sees_own_trainees" ON trainees

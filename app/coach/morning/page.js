@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase-ssr';
 import WorkBackground from '../WorkBackground';
+import HeaderGrid from '../HeaderGrid';
 import MorningTabs from './MorningTabs';
 import './morning.css';
 
@@ -157,11 +158,14 @@ export default async function MorningPage() {
     <WorkBackground>
       <div className="morning-root">
         <div className="m-hdr">
-          <div className="m-hdr-greet">להיום</div>
-          <div className="m-hdr-title">
-            {greeting}, {coach?.name ?? ''}
+          <HeaderGrid />
+          <div className="m-hdr-content">
+            <div className="m-hdr-greet">להיום</div>
+            <div className="m-hdr-title">
+              {greeting}, {coach?.name ?? ''}
+            </div>
+            <div className="m-hdr-date">{dateLabel}</div>
           </div>
-          <div className="m-hdr-date">{dateLabel}</div>
         </div>
         <MorningTabs
           meetings={meetings}
