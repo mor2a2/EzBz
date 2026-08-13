@@ -1,9 +1,9 @@
 import WorkBackground from '../WorkBackground';
 
-export default function IdeasPage() {
+export default function SettingsPage() {
   return (
     <WorkBackground>
-      <p>רעיונות עסקיים — בקרוב.</p>
+      <p>הגדרות — בקרוב.</p>
     </WorkBackground>
   );
 }

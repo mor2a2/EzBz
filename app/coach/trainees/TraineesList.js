@@ -158,10 +158,6 @@ export default function TraineesList({ trainees, groups, initialView }) {
           ))}
         </div>
       )}
-
-      <Link href="/coach/home" className="tr-back">
-        ← חזרה לכוורת
-      </Link>
     </div>
   );
 }

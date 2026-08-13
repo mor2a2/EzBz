@@ -117,6 +117,17 @@ CREATE TABLE income (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- טבלה גלובלית משותפת (רכזי איזור) — אין coach_id/accountant_id בכוונה, ראו CLAUDE.md
+CREATE TABLE coordinators (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  region TEXT NOT NULL,
+  name TEXT NOT NULL,
+  phone TEXT,
+  email TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ============================================================
 -- Row Level Security
 -- ============================================================
@@ -131,6 +142,7 @@ ALTER TABLE trainees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE progress_stages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE income ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coordinators ENABLE ROW LEVEL SECURITY;
 
 -- רו"ח רואה רק את עצמה
 CREATE POLICY "accountant_sees_own_row" ON accountants
@@ -209,4 +221,14 @@ CREATE POLICY "accountant_sees_own_payments" ON payments
 CREATE POLICY "coach_sees_own_payments" ON payments
   FOR ALL USING (
     institution_id IN (SELECT id FROM institutions WHERE coach_id = auth.uid())
+  );
+
+-- coordinators: טבלה גלובלית משותפת, לא scoped ל-coach_id/accountant_id בכוונה
+CREATE POLICY "accountant_manages_coordinators" ON coordinators
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM accountants WHERE email = auth.jwt()->>'email')
+  );
+CREATE POLICY "coach_reads_coordinators" ON coordinators
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM coaches WHERE id = auth.uid())
   );

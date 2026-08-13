@@ -172,9 +172,6 @@ export default async function MorningPage() {
           money={{ toCollect, toReceipt, toPay }}
           completion={{ missingSummaries, missingPlans }}
         />
-        <a className="m-back" href="/coach/home">
-          ← חזרה לכוורת
-        </a>
       </div>
     </WorkBackground>
   );

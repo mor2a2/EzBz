@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase-ssr';
 
 // עמוד נחיתה זמני ומינימלי — רק לוודא שה-magic link מוביל לכאן ולא לשגיאה.
@@ -33,6 +34,9 @@ export default async function AccountantHomePage() {
   return (
     <div style={{ padding: 24 }}>
       <p>ברוך/ה הבא/ה, {accountant.name} — התחברת בהצלחה.</p>
+      <p>
+        <Link href="/accountant/coordinators">ניהול רכזי איזור</Link>
+      </p>
     </div>
   );
 }

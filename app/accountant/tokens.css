@@ -1,0 +1,21 @@
+/* EzBz — שכבה A (רו"ח) design tokens
+   מקור: NLP/מסכים/שכבת רוח/EzBz_dashboard_final (4).html — הדשבורד הנעול,
+   הקובץ היחיד ששכבת A נבנתה ממנו בפועל עד כה. */
+
+:root {
+  --green: #3B6D11;
+  --green-light: #EAF3DE;
+  --green-mid: #639922;
+  --green-pale: #C0DD97;
+  --green-dark: #28500C;
+  --amber: #BA7517;
+  --amber-light: #FAEEDA;
+  --amber-dark: #633806;
+  --amber-mid: #D4861C;
+  --bg: #fff;
+  --bg2: #f7f7f5;
+  --border: #e4e4e0;
+  --text1: #1a1a1a;
+  --text2: #4a4a4a;
+  --text3: #8a8a88;
+}

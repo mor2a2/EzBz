@@ -1,5 +1,6 @@
 import './work.css';
 import { BG_W, BG_H, buildScatteredHexes, hexPoints } from './hexGrid';
+import TabBar from './TabBar';
 
 // רקע ברירת מחדל לכל מסכי העבודה (B2 ואילך): שמפניה בהיר + משושים בודדים
 // מפוזרים (לא רשת חוזרת — זו עברה לתוך כותרות הכרטיסים, ר' HeaderGrid.js,
@@ -27,6 +28,7 @@ export default function WorkBackground({ children }) {
         </g>
       </svg>
       <div className="work-content">{children}</div>
+      <TabBar />
     </div>
   );
 }
