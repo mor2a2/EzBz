@@ -40,10 +40,9 @@
 }
 
 .tab-bar-icon {
-  font-size: 20px;
-  filter: grayscale(1) opacity(0.45);
+  color: var(--work-ink-faint);
 }
 
 .tab-bar-item.on .tab-bar-icon {
-  filter: none;
+  color: var(--work-accent);
 }

@@ -2,8 +2,18 @@
 
 import { useState, useMemo, useTransition } from 'react';
 import Link from 'next/link';
+import {
+  IconUsers,
+  IconClock,
+  IconChevronDown,
+  IconCoin,
+  IconCalendarEvent,
+  IconPlus,
+  IconUserPlus,
+  IconX,
+} from '@tabler/icons-react';
 import HeaderGrid from '../HeaderGrid';
-import { markIncomeReceived } from './actions';
+import { markIncomeReceived, createGroup, createTrainee, assignTraineeToGroup } from './actions';
 
 function initials(name) {
   return name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join('');
@@ -44,7 +54,7 @@ function Actions({ trainee }) {
   );
 }
 
-function TraineeRow({ trainee }) {
+function TraineeRow({ trainee, onAssign }) {
   return (
     <div className="tr-row">
       <div className={`tr-sbar ${trainee.statusColor}`} />
@@ -52,11 +62,27 @@ function TraineeRow({ trainee }) {
       <div className="tr-info">
         <div className="tr-name">{trainee.name}</div>
         <div className="tr-sub">
-          {trainee.nextSessionLabel ? <span>{trainee.nextSessionLabel}</span> : <span>אין פגישה</span>}
+          {trainee.nextSessionLabel ? (
+            <span className="tr-time">
+              <IconClock size={10} />
+              {trainee.nextSessionLabel}
+            </span>
+          ) : (
+            <span>אין פגישה</span>
+          )}
           {trainee.groupName ? (
             <span className="tr-tag">{trainee.groupName}</span>
           ) : (
-            <span className="tr-tag">לא משויך לקבוצה</span>
+            <button
+              type="button"
+              className="tr-assign-tag"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAssign?.(trainee);
+              }}
+            >
+              + שייך לקבוצה
+            </button>
           )}
         </div>
       </div>
@@ -65,24 +91,207 @@ function TraineeRow({ trainee }) {
   );
 }
 
+function Sheet({ title, onClose, children }) {
+  return (
+    <div className="tr-overlay" onClick={onClose}>
+      <div className="tr-sheet" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="tr-sheet-close" onClick={onClose}>
+          <IconX size={16} />
+        </button>
+        <div className="tr-sheet-handle" />
+        <div className="tr-sheet-title">{title}</div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function CreateGroupSheet({ trainees, onClose }) {
+  const [name, setName] = useState('');
+  const [scheduleLabel, setScheduleLabel] = useState('');
+  const [memberIds, setMemberIds] = useState([]);
+  const [error, setError] = useState(null);
+  const [isPending, startTransition] = useTransition();
+
+  function toggleMember(id) {
+    setMemberIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+
+  function save() {
+    setError(null);
+    startTransition(async () => {
+      const res = await createGroup({ name, scheduleLabel, memberIds });
+      if (res?.error) setError(res.error);
+      else onClose();
+    });
+  }
+
+  return (
+    <Sheet title="צור קבוצה חדשה" onClose={onClose}>
+      <div className="tr-field">
+        <label>שם הקבוצה</label>
+        <input type="text" placeholder="לדוגמא: נוער פתח תקווה" value={name} onChange={(e) => setName(e.target.value)} />
+      </div>
+      <div className="tr-field">
+        <label>מועד קבוע</label>
+        <input
+          type="text"
+          placeholder="לדוגמא: ראשון 10:00"
+          value={scheduleLabel}
+          onChange={(e) => setScheduleLabel(e.target.value)}
+        />
+      </div>
+      <div className="tr-field">
+        <label>בחר מתאמנים</label>
+        <div className="tr-members-select">
+          {trainees.length === 0 && <div className="tr-member-empty">אין עדיין מתאמנים</div>}
+          {trainees.map((t) => (
+            <div className="tr-member-option" key={t.id}>
+              <input
+                type="checkbox"
+                id={`m-${t.id}`}
+                checked={memberIds.includes(t.id)}
+                onChange={() => toggleMember(t.id)}
+              />
+              <label htmlFor={`m-${t.id}`}>{t.name}</label>
+              <span className="tr-member-status">{t.groupName || 'לא משויך'}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      {error && <div className="tr-sheet-error">{error}</div>}
+      <button type="button" className="tr-save-btn" disabled={isPending} onClick={save}>
+        {isPending ? 'שומר...' : 'שמור קבוצה'}
+      </button>
+    </Sheet>
+  );
+}
+
+function CreateTraineeSheet({ groups, onClose }) {
+  const [name, setName] = useState('');
+  const [area, setArea] = useState('');
+  const [groupId, setGroupId] = useState('');
+  const [error, setError] = useState(null);
+  const [isPending, startTransition] = useTransition();
+
+  function save() {
+    setError(null);
+    startTransition(async () => {
+      const res = await createTrainee({ name, area, groupId: groupId || null });
+      if (res?.error) setError(res.error);
+      else onClose();
+    });
+  }
+
+  return (
+    <Sheet title="הוסף מתאמן חדש" onClose={onClose}>
+      <div className="tr-field">
+        <label>שם המתאמן</label>
+        <input type="text" placeholder="שם מלא" value={name} onChange={(e) => setName(e.target.value)} />
+      </div>
+      <div className="tr-field">
+        <label>אזור</label>
+        <input type="text" placeholder="לדוגמא: רעננה" value={area} onChange={(e) => setArea(e.target.value)} />
+      </div>
+      <div className="tr-field">
+        <label>קבוצה (אופציונלי)</label>
+        <select value={groupId} onChange={(e) => setGroupId(e.target.value)}>
+          <option value="">ללא קבוצה</option>
+          {groups.map((g) => (
+            <option key={g.id} value={g.id}>
+              {g.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      {error && <div className="tr-sheet-error">{error}</div>}
+      <button type="button" className="tr-save-btn" disabled={isPending} onClick={save}>
+        {isPending ? 'שומר...' : 'שמור מתאמן'}
+      </button>
+    </Sheet>
+  );
+}
+
+function AssignGroupSheet({ trainee, groups, onClose }) {
+  const [error, setError] = useState(null);
+  const [isPending, startTransition] = useTransition();
+
+  function assign(groupId) {
+    setError(null);
+    startTransition(async () => {
+      const res = await assignTraineeToGroup(trainee.id, groupId);
+      if (res?.error) setError(res.error);
+      else onClose();
+    });
+  }
+
+  return (
+    <Sheet title={`שייך את ${trainee.name} לקבוצה`} onClose={onClose}>
+      {groups.length === 0 && <div className="tr-member-empty">אין עדיין קבוצות — צרי קבוצה חדשה קודם</div>}
+      <div className="tr-members-select">
+        {groups.map((g) => (
+          <button
+            type="button"
+            key={g.id}
+            className="tr-assign-option"
+            disabled={isPending}
+            onClick={() => assign(g.id)}
+          >
+            <IconUsers size={13} />
+            {g.name}
+          </button>
+        ))}
+      </div>
+      {error && <div className="tr-sheet-error">{error}</div>}
+    </Sheet>
+  );
+}
+
 export default function TraineesList({ trainees, groups, initialView }) {
-  const [activeRegion, setActiveRegion] = useState('הכל');
+  const [activeRegion, setActiveRegion] = useState('כולם');
   const [activeTab, setActiveTab] = useState(initialView === 'groups' ? 'groups' : 'members');
   const [query, setQuery] = useState('');
+  const [openGroups, setOpenGroups] = useState(() => new Set(groups.map((g) => g.id)));
+  const [filterIncome, setFilterIncome] = useState(false);
+  const [filterSession, setFilterSession] = useState(false);
+  const [assignTarget, setAssignTarget] = useState(null);
+  const [showGroupSheet, setShowGroupSheet] = useState(false);
+  const [showTraineeSheet, setShowTraineeSheet] = useState(false);
+
+  function toggleGroup(id) {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   const regions = useMemo(
-    () => ['הכל', ...new Set(trainees.map((t) => t.area).filter(Boolean))],
+    () => ['כולם', ...new Set(trainees.map((t) => t.area).filter(Boolean))],
     [trainees]
   );
 
   const filteredTrainees = useMemo(() => {
     const q = query.trim().toLowerCase();
     return trainees.filter((t) => {
-      const regionOk = activeRegion === 'הכל' || t.area === activeRegion;
+      const regionOk = activeRegion === 'כולם' || t.area === activeRegion;
       const queryOk = !q || t.name.toLowerCase().includes(q);
       return regionOk && queryOk;
     });
   }, [trainees, activeRegion, query]);
+
+  const unassignedCount = useMemo(() => trainees.filter((t) => !t.groupId).length, [trainees]);
+
+  const visibleMembers = useMemo(
+    () =>
+      filteredTrainees.filter((t) => {
+        const incomeOk = !filterIncome || t.pendingIncomeId;
+        const sessionOk = !filterSession || t.nextSessionLabel;
+        return incomeOk && sessionOk;
+      }),
+    [filteredTrainees, filterIncome, filterSession]
+  );
 
   const groupsWithMembers = useMemo(
     () =>
@@ -120,6 +329,7 @@ export default function TraineesList({ trainees, groups, initialView }) {
         </button>
         <button className={`tr-tab ${activeTab === 'members' ? 'on' : ''}`} onClick={() => setActiveTab('members')}>
           לפי מתאמנים
+          {unassignedCount > 0 && <span className="tr-tab-badge">{unassignedCount}</span>}
         </button>
       </div>
 
@@ -135,28 +345,81 @@ export default function TraineesList({ trainees, groups, initialView }) {
       {activeTab === 'groups' ? (
         <div>
           {groupsWithMembers.length === 0 && <div className="tr-empty">אין קבוצות עדיין.</div>}
-          {groupsWithMembers.map((g) => (
-            <div className="tr-gcard" key={g.id}>
-              <div className="tr-ghdr">
-                <div className="tr-gname">
-                  {g.name}
-                  <span className="tr-gbadge">{g.members.length}</span>
+          {groupsWithMembers.map((g) => {
+            const isOpen = openGroups.has(g.id);
+            return (
+              <div className="tr-gcard" key={g.id}>
+                <div className="tr-ghdr" onClick={() => toggleGroup(g.id)}>
+                  <div className="tr-gname">
+                    <IconUsers size={13} className="tr-gicon" />
+                    {g.name}
+                    <span className="tr-gbadge">{g.members.length}</span>
+                  </div>
+                  <div className="tr-ghdr-right">
+                    {g.schedule_label && (
+                      <span className="tr-gtime">
+                        <IconClock size={10} />
+                        {g.schedule_label}
+                      </span>
+                    )}
+                    <IconChevronDown size={14} className={`tr-chev ${isOpen ? 'op' : ''}`} />
+                  </div>
                 </div>
-                {g.schedule_label && <div className="tr-gtime">{g.schedule_label}</div>}
+                <div className={`tr-gmembers ${isOpen ? 'op' : ''}`}>
+                  {g.members.map((t) => (
+                    <TraineeRow key={t.id} trainee={t} onAssign={setAssignTarget} />
+                  ))}
+                </div>
               </div>
-              {g.members.map((t) => (
-                <TraineeRow key={t.id} trainee={t} />
-              ))}
-            </div>
-          ))}
+            );
+          })}
+          <div className="tr-bottom-btns">
+            <button type="button" className="tr-addbtn" onClick={() => setShowGroupSheet(true)}>
+              <IconPlus size={14} /> הוסף קבוצה
+            </button>
+            <button type="button" className="tr-addbtn sec" onClick={() => setShowTraineeSheet(true)}>
+              <IconUserPlus size={14} /> מתאמן
+            </button>
+          </div>
         </div>
       ) : (
         <div>
-          {filteredTrainees.length === 0 && <div className="tr-empty">אין מתאמנים.</div>}
-          {filteredTrainees.map((t) => (
-            <TraineeRow key={t.id} trainee={t} />
+          <div className="tr-frow">
+            <span className="tr-fcount">{visibleMembers.length} מתאמנים</span>
+            <button
+              className={`tr-hexf ${filterIncome ? 'act' : ''}`}
+              title="הכנסה ממתינה"
+              onClick={() => setFilterIncome((v) => !v)}
+            >
+              <IconCoin size={13} />
+            </button>
+            <button
+              className={`tr-hexf ${filterSession ? 'act' : ''}`}
+              title="פגישה קרובה"
+              onClick={() => setFilterSession((v) => !v)}
+            >
+              <IconCalendarEvent size={13} />
+            </button>
+          </div>
+          {visibleMembers.length === 0 && <div className="tr-empty">אין מתאמנים.</div>}
+          {visibleMembers.map((t) => (
+            <TraineeRow key={t.id} trainee={t} onAssign={setAssignTarget} />
           ))}
+          <div className="tr-bottom-btns">
+            <button type="button" className="tr-addbtn" onClick={() => setShowTraineeSheet(true)}>
+              <IconUserPlus size={14} /> הוסף מתאמן
+            </button>
+            <button type="button" className="tr-addbtn sec" onClick={() => setShowGroupSheet(true)}>
+              <IconUsers size={14} /> קבוצה
+            </button>
+          </div>
         </div>
+      )}
+
+      {showGroupSheet && <CreateGroupSheet trainees={trainees} onClose={() => setShowGroupSheet(false)} />}
+      {showTraineeSheet && <CreateTraineeSheet groups={groups} onClose={() => setShowTraineeSheet(false)} />}
+      {assignTarget && (
+        <AssignGroupSheet trainee={assignTarget} groups={groups} onClose={() => setAssignTarget(null)} />
       )}
     </div>
   );
