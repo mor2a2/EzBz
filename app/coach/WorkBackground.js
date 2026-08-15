@@ -9,26 +9,32 @@ export default function WorkBackground({ children }) {
   const hexes = buildScatteredHexes();
 
   return (
-    <div className="work-page">
-      <svg
-        style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}
-        viewBox={`0 0 ${BG_W} ${BG_H}`}
-        preserveAspectRatio="xMidYMid slice"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect width={BG_W} height={BG_H} fill="var(--work-bg)" />
-        <g fill="none" style={{ stroke: 'var(--work-grid-stroke)', strokeWidth: 1.1 }}>
-          {hexes.map((h) => (
-            <polygon
-              key={`${h.cx},${h.cy}`}
-              points={hexPoints(h.cx, h.cy, h.r)}
-              style={{ strokeOpacity: h.opacity }}
-            />
-          ))}
-        </g>
-      </svg>
-      <div className="work-content">{children}</div>
-      <TabBar />
-    </div>
+    <>
+      {/* גב מלא מאחורי המסגרת (440px) — רלוונטי רק בחלונות רחבים מהמסגרת (דסקטופ).
+          מחוץ ל-.work-page בכוונה: אם הייתה בפנים, ה-transform על .work-page היה
+          הופך אותה ל-position:absolute יחסית למסגרת, לא לכל חלון הדפדפן. */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: -1, background: 'var(--work-bg)' }} />
+      <div className="work-page">
+        <svg
+          style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}
+          viewBox={`0 0 ${BG_W} ${BG_H}`}
+          preserveAspectRatio="xMidYMid slice"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect width={BG_W} height={BG_H} fill="var(--work-bg)" />
+          <g fill="none" style={{ stroke: 'var(--work-grid-stroke)', strokeWidth: 1.1 }}>
+            {hexes.map((h) => (
+              <polygon
+                key={`${h.cx},${h.cy}`}
+                points={hexPoints(h.cx, h.cy, h.r)}
+                style={{ strokeOpacity: h.opacity }}
+              />
+            ))}
+          </g>
+        </svg>
+        <div className="work-content">{children}</div>
+        <TabBar />
+      </div>
+    </>
   );
 }

@@ -1,8 +1,21 @@
 .work-page {
   font-family: var(--coach-font);
   direction: rtl;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 440px;
+  margin: 0 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
+  /* מקימה containing block חדש ל-position:fixed צאצאים (TabBar, sheets) — כך שהם
+     תמיד יתייחסו למסגרת הכרטיס (440px, גובה מסך אמיתי) ולא לחלון הדפדפן הגולמי.
+     בלי זה: בדסקטופ רחב/גבוה, אלמנטים fixed "בורחים" לתחתית החלון האמיתי, רחוק
+     מהכרטיס. עם transform, position:fixed מתנהג כמו position:absolute יחסית
+     ל-.work-page עצמו — וכיוון ש-.work-page קבוע בגובה (100dvh) וגולל פנימית
+     (overflow-y:auto), זה עדיין תמיד "צמוד למסך" בדיוק כמו fixed אמיתי, רק
+     ממוסגר נכון. נבדק גם עם רשימה ארוכה (גלילה פנימית, לא רק תוכן קצר). */
+  transform: translateZ(0);
   color: var(--work-ink);
 }
 
@@ -22,6 +35,8 @@
   bottom: 0;
   right: 0;
   left: 0;
+  max-width: 440px;
+  margin: 0 auto;
   z-index: 10;
   display: flex;
   justify-content: space-around;

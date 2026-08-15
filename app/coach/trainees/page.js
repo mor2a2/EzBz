@@ -31,7 +31,7 @@ export default async function TraineesPage({ searchParams }) {
 
   const now = new Date();
 
-  const [groupsRes, trainRes, pendingIncomeRes, upcomingSessionsRes] = await Promise.all([
+  const [groupsRes, trainRes, pendingIncomeRes, upcomingSessionsRes, coordinatorsRes] = await Promise.all([
     supabase.from('groups').select('id, name, schedule_label').eq('coach_id', user.id),
     supabase.from('trainees').select('id, name, area, group_id, parent_phone').eq('coach_id', user.id),
     supabase
@@ -45,6 +45,7 @@ export default async function TraineesPage({ searchParams }) {
       .eq('coach_id', user.id)
       .gte('date', now.toISOString())
       .order('date', { ascending: true }),
+    supabase.from('coordinators').select('id, region, name, phone, email').order('region'),
   ]);
 
   const groups = groupsRes.data ?? [];
@@ -77,9 +78,16 @@ export default async function TraineesPage({ searchParams }) {
     };
   });
 
+  const coordinators = coordinatorsRes.data ?? [];
+
   return (
     <WorkBackground>
-      <TraineesList trainees={trainees} groups={groups} initialView={view === 'groups' ? 'groups' : 'members'} />
+      <TraineesList
+        trainees={trainees}
+        groups={groups}
+        coordinators={coordinators}
+        initialView={view === 'groups' ? 'groups' : 'members'}
+      />
     </WorkBackground>
   );
 }

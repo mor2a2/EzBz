@@ -11,6 +11,12 @@ import {
   IconPlus,
   IconUserPlus,
   IconX,
+  IconSearch,
+  IconMapPin,
+  IconUser,
+  IconPhone,
+  IconMail,
+  IconBrandWhatsapp,
 } from '@tabler/icons-react';
 import HeaderGrid from '../HeaderGrid';
 import { markIncomeReceived, createGroup, createTrainee, assignTraineeToGroup } from './actions';
@@ -23,6 +29,15 @@ function waLink(phone, name) {
   if (!phone) return null;
   const digits = phone.replace(/\D/g, '').replace(/^0/, '');
   const text = encodeURIComponent(`שלום, פונה בקשר ל${name}`);
+  return `https://wa.me/972${digits}?text=${text}`;
+}
+
+function coordinatorWaLink(coordinator) {
+  if (!coordinator.phone) return null;
+  const digits = coordinator.phone.replace(/\D/g, '').replace(/^0/, '');
+  const text = encodeURIComponent(
+    `שלום ${coordinator.name}, אני מדריך/ה NLP חדש/ה באיזור ${coordinator.region} דרך EzBz, אשמח להכיר!`
+  );
   return `https://wa.me/972${digits}?text=${text}`;
 }
 
@@ -167,9 +182,62 @@ function CreateGroupSheet({ trainees, onClose }) {
   );
 }
 
-function CreateTraineeSheet({ groups, onClose }) {
+function CityAutocomplete({ value, onChange, suggestions }) {
+  const [open, setOpen] = useState(false);
+  // null = show the full list (on focus, before the user actively types anything new).
+  // string = the user is typing — narrow the list to match it, same as a normal autocomplete.
+  const [filterText, setFilterText] = useState(null);
+
+  const filtered = useMemo(() => {
+    if (filterText === null) return suggestions;
+    const q = filterText.trim();
+    return q ? suggestions.filter((s) => s.city.includes(q)) : suggestions;
+  }, [suggestions, filterText]);
+
+  return (
+    <div className="tr-autocomplete">
+      <input
+        type="text"
+        placeholder="הקלד או בחר עיר..."
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setFilterText(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => {
+          setOpen(true);
+          setFilterText(null);
+        }}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+      />
+      {open && filtered.length > 0 && (
+        <div className="tr-autocomplete-list">
+          {filtered.map(({ city, hasCoordinator }) => (
+            <button
+              type="button"
+              key={city}
+              className="tr-autocomplete-option"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                onChange(city);
+                setFilterText(null);
+                setOpen(false);
+              }}
+            >
+              <span>{city}</span>
+              {hasCoordinator && <span className="tr-autocomplete-badge">יש רכז</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CreateTraineeSheet({ groups, citySuggestions, initialArea, onClose }) {
   const [name, setName] = useState('');
-  const [area, setArea] = useState('');
+  const [area, setArea] = useState(initialArea || '');
   const [groupId, setGroupId] = useState('');
   const [error, setError] = useState(null);
   const [isPending, startTransition] = useTransition();
@@ -177,7 +245,7 @@ function CreateTraineeSheet({ groups, onClose }) {
   function save() {
     setError(null);
     startTransition(async () => {
-      const res = await createTrainee({ name, area, groupId: groupId || null });
+      const res = await createTrainee({ name, area: area || null, groupId: groupId || null });
       if (res?.error) setError(res.error);
       else onClose();
     });
@@ -191,7 +259,10 @@ function CreateTraineeSheet({ groups, onClose }) {
       </div>
       <div className="tr-field">
         <label>אזור</label>
-        <input type="text" placeholder="לדוגמא: רעננה" value={area} onChange={(e) => setArea(e.target.value)} />
+        <CityAutocomplete value={area} onChange={setArea} suggestions={citySuggestions} />
+        {citySuggestions.length === 0 && (
+          <div className="tr-field-hint">אין עדיין ערים מוצעות — אפשר להקליד עיר חופשית</div>
+        )}
       </div>
       <div className="tr-field">
         <label>קבוצה (אופציונלי)</label>
@@ -247,7 +318,100 @@ function AssignGroupSheet({ trainee, groups, onClose }) {
   );
 }
 
-export default function TraineesList({ trainees, groups, initialView }) {
+function AddRegionSheet({ coordinators, cityOptions, onAddTrainee, onClose }) {
+  const [filter, setFilter] = useState('');
+  const [selectedCity, setSelectedCity] = useState(null);
+
+  const filteredCities = useMemo(() => {
+    const q = filter.trim();
+    return q ? cityOptions.filter((c) => c.includes(q)) : cityOptions;
+  }, [cityOptions, filter]);
+
+  const matchedCoordinators = useMemo(
+    () => (selectedCity ? coordinators.filter((c) => c.region === selectedCity) : []),
+    [coordinators, selectedCity]
+  );
+
+  return (
+    <Sheet title="מצא רכז לפי עיר" onClose={onClose}>
+      {cityOptions.length === 0 ? (
+        <div className="tr-no-result">הרו"ח עדיין לא הזינה ערים ורכזים — יש לפנות אליה</div>
+      ) : (
+        <>
+          <div className="tr-city-search">
+            <IconSearch size={13} />
+            <input
+              type="text"
+              placeholder="חפש עיר..."
+              value={filter}
+              onChange={(e) => {
+                setFilter(e.target.value);
+                setSelectedCity(null);
+              }}
+            />
+          </div>
+
+          <div className="tr-members-select">
+            {filteredCities.length === 0 && <div className="tr-member-empty">לא נמצאה עיר תואמת</div>}
+            {filteredCities.map((city) => (
+              <button
+                type="button"
+                key={city}
+                className={`tr-assign-option ${selectedCity === city ? 'on' : ''}`}
+                onClick={() => setSelectedCity(city)}
+              >
+                <IconMapPin size={13} />
+                {city}
+              </button>
+            ))}
+          </div>
+
+          {matchedCoordinators.map((coordinator) => {
+            const waHref = coordinatorWaLink(coordinator);
+            return (
+              <div className="tr-coord-result" key={coordinator.id}>
+                <div className="tr-coord-city">
+                  <IconMapPin size={13} />
+                  {coordinator.region}
+                </div>
+                <div className="tr-coord-row">
+                  <IconUser size={12} />
+                  <span>{coordinator.name}</span>
+                </div>
+                {coordinator.phone && (
+                  <div className="tr-coord-row">
+                    <IconPhone size={12} />
+                    <span>{coordinator.phone}</span>
+                  </div>
+                )}
+                {coordinator.email && (
+                  <div className="tr-coord-row">
+                    <IconMail size={12} />
+                    <span>{coordinator.email}</span>
+                  </div>
+                )}
+                {waHref && (
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="tr-wa-btn">
+                    <IconBrandWhatsapp size={14} /> שלח הודעת היכרות
+                  </a>
+                )}
+                <button
+                  type="button"
+                  className="tr-coord-secondary-btn"
+                  onClick={() => onAddTrainee(coordinator.region)}
+                >
+                  <IconUserPlus size={12} /> כבר יש מתאמן מהעיר הזו — הוסף אותו
+                </button>
+              </div>
+            );
+          })}
+        </>
+      )}
+    </Sheet>
+  );
+}
+
+export default function TraineesList({ trainees, groups, coordinators = [], initialView }) {
   const [activeRegion, setActiveRegion] = useState('כולם');
   const [activeTab, setActiveTab] = useState(initialView === 'groups' ? 'groups' : 'members');
   const [query, setQuery] = useState('');
@@ -257,6 +421,8 @@ export default function TraineesList({ trainees, groups, initialView }) {
   const [assignTarget, setAssignTarget] = useState(null);
   const [showGroupSheet, setShowGroupSheet] = useState(false);
   const [showTraineeSheet, setShowTraineeSheet] = useState(false);
+  const [showRegionSheet, setShowRegionSheet] = useState(false);
+  const [prefillArea, setPrefillArea] = useState(null);
 
   function toggleGroup(id) {
     setOpenGroups((prev) => {
@@ -271,6 +437,26 @@ export default function TraineesList({ trainees, groups, initialView }) {
     () => ['כולם', ...new Set(trainees.map((t) => t.area).filter(Boolean))],
     [trainees]
   );
+
+  function openTraineeSheet(area = null) {
+    setPrefillArea(area);
+    setShowRegionSheet(false);
+    setShowTraineeSheet(true);
+  }
+
+  const cityOptions = useMemo(
+    () => [...new Set(coordinators.map((c) => c.region))].sort((a, b) => a.localeCompare(b, 'he')),
+    [coordinators]
+  );
+
+  const citySuggestions = useMemo(() => {
+    const coordCities = new Set(coordinators.map((c) => c.region));
+    const usedCities = trainees.map((t) => t.area).filter(Boolean);
+    const all = new Set([...coordCities, ...usedCities]);
+    return [...all]
+      .sort((a, b) => a.localeCompare(b, 'he'))
+      .map((city) => ({ city, hasCoordinator: coordCities.has(city) }));
+  }, [coordinators, trainees]);
 
   const filteredTrainees = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -321,6 +507,9 @@ export default function TraineesList({ trainees, groups, initialView }) {
             {r}
           </button>
         ))}
+        <button type="button" className="tr-rtab add" onClick={() => setShowRegionSheet(true)}>
+          + איזור
+        </button>
       </div>
 
       <div className="tr-tabs">
@@ -377,7 +566,7 @@ export default function TraineesList({ trainees, groups, initialView }) {
             <button type="button" className="tr-addbtn" onClick={() => setShowGroupSheet(true)}>
               <IconPlus size={14} /> הוסף קבוצה
             </button>
-            <button type="button" className="tr-addbtn sec" onClick={() => setShowTraineeSheet(true)}>
+            <button type="button" className="tr-addbtn sec" onClick={() => openTraineeSheet(activeRegion !== 'כולם' ? activeRegion : null)}>
               <IconUserPlus size={14} /> מתאמן
             </button>
           </div>
@@ -406,7 +595,7 @@ export default function TraineesList({ trainees, groups, initialView }) {
             <TraineeRow key={t.id} trainee={t} onAssign={setAssignTarget} />
           ))}
           <div className="tr-bottom-btns">
-            <button type="button" className="tr-addbtn" onClick={() => setShowTraineeSheet(true)}>
+            <button type="button" className="tr-addbtn" onClick={() => openTraineeSheet(activeRegion !== 'כולם' ? activeRegion : null)}>
               <IconUserPlus size={14} /> הוסף מתאמן
             </button>
             <button type="button" className="tr-addbtn sec" onClick={() => setShowGroupSheet(true)}>
@@ -417,7 +606,22 @@ export default function TraineesList({ trainees, groups, initialView }) {
       )}
 
       {showGroupSheet && <CreateGroupSheet trainees={trainees} onClose={() => setShowGroupSheet(false)} />}
-      {showTraineeSheet && <CreateTraineeSheet groups={groups} onClose={() => setShowTraineeSheet(false)} />}
+      {showTraineeSheet && (
+        <CreateTraineeSheet
+          groups={groups}
+          citySuggestions={citySuggestions}
+          initialArea={prefillArea}
+          onClose={() => setShowTraineeSheet(false)}
+        />
+      )}
+      {showRegionSheet && (
+        <AddRegionSheet
+          coordinators={coordinators}
+          cityOptions={cityOptions}
+          onAddTrainee={openTraineeSheet}
+          onClose={() => setShowRegionSheet(false)}
+        />
+      )}
       {assignTarget && (
         <AssignGroupSheet trainee={assignTarget} groups={groups} onClose={() => setAssignTarget(null)} />
       )}
