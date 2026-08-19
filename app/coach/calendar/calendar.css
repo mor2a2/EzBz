@@ -1,0 +1,95 @@
+.cal-root {
+  max-width: 440px;
+  margin: 0 auto;
+  background: var(--work-card-bg);
+  border: 0.5px solid var(--work-card-border);
+  border-radius: 14px;
+  overflow: hidden;
+  color: var(--work-ink);
+  position: relative;
+}
+
+.cal-hdr { background: var(--work-accent); padding: 14px 16px; position: relative; overflow: hidden; }
+.cal-hdr-content { position: relative; z-index: 1; }
+.cal-hdr-greet { font-size: 10px; color: var(--work-accent-pale); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.cal-hdr-title { font-size: 18px; font-weight: 600; color: #fff; }
+
+.cal-views { display: flex; margin: 8px 12px 0; background: var(--work-card-bg); border-radius: 8px; border: 0.5px solid var(--work-card-border); overflow: hidden; }
+.cal-vtab { flex: 1; text-align: center; padding: 7px 0; font-size: 11px; color: var(--work-ink-faint); cursor: pointer; border: none; background: transparent; font-family: inherit; }
+.cal-vtab.on { background: var(--work-accent); color: #fff; font-weight: 500; }
+
+.cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; }
+.cal-nav-btn { width: 26px; height: 26px; border-radius: 6px; border: 0.5px solid var(--work-card-border); background: var(--work-card-bg); color: var(--work-accent); font-size: 14px; cursor: pointer; }
+.cal-nav-label { font-size: 12.5px; font-weight: 600; border: none; background: transparent; color: var(--work-ink); cursor: pointer; font-family: inherit; }
+
+/* חודשי */
+.cal-month { padding: 4px 10px 8px; }
+.cal-month-hdr { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-month-hdr-cell { text-align: center; font-size: 9.5px; color: var(--work-ink-faint); padding: 4px 0; }
+.cal-month-row { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-month-cell {
+  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  border: none; background: transparent; cursor: pointer; border-radius: 8px; font-family: inherit;
+}
+.cal-month-cell.dim .cal-month-daynum { color: var(--work-ink-faint); opacity: 0.5; }
+.cal-month-cell.today .cal-month-daynum { background: var(--work-accent); color: #fff; }
+.cal-month-daynum { font-size: 11.5px; color: var(--work-ink); width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+.cal-month-dots { display: flex; gap: 2px; height: 5px; }
+
+.cal-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.cal-dot.solo { background: var(--session-solo); }
+.cal-dot.group { background: var(--work-accent); }
+
+/* שבועי */
+.cal-week-day { border-top: 0.5px solid var(--work-card-border); }
+.cal-week-day:first-of-type { border-top: none; }
+.cal-week-day.is-busy { background: var(--calendar-day-busy-pale); border-right: 3px solid var(--calendar-day-busy); }
+.cal-week-daylbl { font-size: 10.5px; font-weight: 600; color: var(--work-ink-faint); padding: 9px 14px 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.cal-week-daylbl.is-today { color: var(--work-accent); font-weight: 700; }
+.cal-week-empty { font-size: 10.5px; color: var(--work-ink-faint); opacity: 0.65; padding: 1px 14px 7px; }
+
+.cal-week-past-toggle {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 6px 0; border: none; background: transparent; cursor: pointer; font-family: inherit;
+  font-size: 10px; color: var(--work-ink-faint);
+}
+.cal-week-past-chev { transition: transform 0.2s; }
+.cal-week-past-chev.op { transform: rotate(180deg); }
+.cal-week-past-badge { width: 6px; height: 6px; border-radius: 50%; background: var(--status-urgent); }
+
+/* יומי (ומשותף לשבועי) */
+.cal-sess-row {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 14px; border: none; background: transparent;
+  cursor: pointer; font-family: inherit; text-align: right; border-top: 0.5px solid var(--work-card-border);
+}
+.cal-week-day .cal-sess-row:first-of-type, .cal-day .cal-sess-row:first-child { border-top: none; }
+.cal-sess-time { font-size: 12px; font-weight: 600; color: var(--work-accent); flex-shrink: 0; width: 38px; }
+.cal-sess-name { font-size: 12.5px; font-weight: 500; flex: 1; min-width: 0; }
+.cal-sess-type { font-size: 9.5px; color: var(--work-ink-faint); flex-shrink: 0; }
+.cal-day { padding-bottom: 4px; }
+
+
+/* Bottom sheet */
+.cal-sheet-overlay {
+  position: fixed; inset: 0; background: rgba(42, 32, 19, 0.45); z-index: 20;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.cal-sheet {
+  width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; background: var(--work-card-bg);
+  border-radius: 18px 18px 0 0; padding: 10px 18px 20px; color: var(--work-ink);
+}
+.cal-sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--work-card-border); margin: 4px auto 12px; }
+.cal-sheet-hdr { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.cal-sheet-title { font-size: 15px; font-weight: 600; }
+.cal-sheet-sub { font-size: 11px; color: var(--work-ink-faint); margin-top: 3px; }
+.cal-sheet-close { width: 26px; height: 26px; border-radius: 50%; border: none; background: var(--work-accent-pale); color: var(--work-accent); font-size: 12px; cursor: pointer; flex-shrink: 0; }
+
+.cal-sheet-reminder { margin-top: 12px; font-size: 11.5px; color: var(--status-pending); background: var(--status-pending-pale); border-radius: 8px; padding: 8px 10px; }
+
+.cal-sheet-status { display: inline-block; margin-top: 12px; font-size: 10.5px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: var(--status-pending-pale); color: var(--status-pending); }
+.cal-sheet-status.done { background: var(--status-ok-pale); color: var(--status-ok); }
+
+.cal-sheet-actions { display: flex; gap: 8px; margin-top: 16px; }
+.cal-sheet-btn { flex: 1; text-align: center; padding: 10px 0; border-radius: 8px; font-size: 12.5px; font-weight: 500; text-decoration: none; }
+.cal-sheet-btn.primary { background: var(--work-accent); color: #fff; }
+.cal-sheet-btn.ghost { background: var(--work-accent-pale); color: var(--work-accent); }
