@@ -512,6 +512,8 @@ export default function TraineesList({ trainees, groups, coordinators = [], init
         </button>
       </div>
 
+      <div className="tr-region-label">{activeRegion !== 'כולם' ? `מציג: ${activeRegion}` : ''}</div>
+
       <div className="tr-tabs">
         <button className={`tr-tab ${activeTab === 'groups' ? 'on' : ''}`} onClick={() => setActiveTab('groups')}>
           לפי קבוצות

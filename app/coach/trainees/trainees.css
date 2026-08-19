@@ -22,6 +22,8 @@
 .tr-rtab.on { background: var(--work-accent); color: #fff; border-color: var(--work-accent); font-weight: 500; }
 .tr-rtab.add { background: transparent; color: var(--work-accent); border-color: var(--work-accent); border-style: dashed; }
 
+.tr-region-label { text-align: center; font-size: 10px; color: var(--work-ink-faint); padding: 3px 0; min-height: 16px; }
+
 .tr-tabs { display: flex; margin: 8px 12px 0; background: var(--work-card-bg); border-radius: 8px; border: 0.5px solid var(--work-card-border); overflow: hidden; }
 .tr-tab { flex: 1; text-align: center; padding: 7px 0; font-size: 11px; color: var(--work-ink-faint); cursor: pointer; position: relative; }
 .tr-tab.on { background: var(--work-accent); color: #fff; font-weight: 500; }

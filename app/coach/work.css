@@ -25,9 +25,15 @@
 
 .work-content {
   position: relative;
-  z-index: 5;
   padding: 24px;
   padding-bottom: 76px;
+  /* בלי z-index כאן בכוונה: z-index יוצר stacking context חדש, שהיה "לוכד" את
+     ה-z-index של sheets בתוכו (.tr-overlay, z-index:50) ומגביל אותם בפועל ל-5
+     כשמשווים מול .tab-bar (z-index:10) ברמת .work-page — גרם ל-TabBar לצייר
+     מעל חלק מה-sheet ולחסום קליקים במסכים נמוכים (התגלה בבדיקה אמיתית של מור).
+     בלי z-index, position:relative לבד לא יוצר stacking context, וה-DOM order
+     (אחרי ה-SVG) מספיק כדי שהתוכן יצויר מעליו — ה-sheets חוזרים להיות מעל TabBar
+     תמיד, בלי תלות בגובה החלון. */
 }
 
 .tab-bar {
