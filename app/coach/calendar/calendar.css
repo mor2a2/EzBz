@@ -58,8 +58,7 @@
 .cal-week-past-badge { width: 6px; height: 6px; border-radius: 50%; background: var(--status-urgent); }
 
 .cal-range-notice { padding: 56px 28px; text-align: center; }
-.cal-range-notice-title { font-size: 14px; font-weight: 600; color: var(--work-ink); margin-bottom: 6px; }
-.cal-range-notice-sub { font-size: 11.5px; color: var(--work-ink-faint); }
+.cal-range-notice-title { font-size: 15px; font-weight: 600; color: var(--work-ink); }
 
 /* יומי (ומשותף לשבועי) */
 .cal-sess-row {

@@ -101,11 +101,10 @@ export default function Calendar({ sessions, initialDate, rangeStart, rangeEnd }
 
       {view === 'month' && outOfRangeDirection && (
         <div className="cal-range-notice">
-          <div className="cal-range-notice-title">הלכת רחוק מדי</div>
-          <div className="cal-range-notice-sub">
+          <div className="cal-range-notice-title">
             {outOfRangeDirection === 'future'
-              ? 'כרגע ניתן לראות עד חצי שנה קדימה.'
-              : 'כרגע ניתן לראות עד חצי שנה אחורה.'}
+              ? 'כרגע ניתן לראות עד חצי שנה קדימה'
+              : 'כרגע ניתן לראות עד חצי שנה אחורה'}
           </div>
         </div>
       )}
