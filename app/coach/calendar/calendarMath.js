@@ -19,6 +19,14 @@ export function addMonths(d, n) {
   return new Date(d.getFullYear(), d.getMonth() + n, 1);
 }
 
+// שונה מ-addMonths: שומר על יום-בחודש (לא מאפס ל-1), לחישוב טווח שליפה
+// "חצי שנה מהיום" ולא "תחילת חודש".
+export function monthsFromToday(n, from = new Date()) {
+  const d = new Date(from);
+  d.setMonth(d.getMonth() + n);
+  return d;
+}
+
 export function startOfWeek(d) {
   const x = startOfDay(d);
   x.setDate(x.getDate() - x.getDay());
@@ -27,6 +35,10 @@ export function startOfWeek(d) {
 
 export function startOfMonth(d) {
   return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+
+export function endOfMonth(d) {
+  return new Date(d.getFullYear(), d.getMonth() + 1, 0);
 }
 
 export function buildWeekDays(cursor) {

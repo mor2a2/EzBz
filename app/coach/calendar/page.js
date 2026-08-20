@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase-ssr';
 import WorkBackground from '../WorkBackground';
 import Calendar from './Calendar';
+import { monthsFromToday } from './calendarMath';
 
 export default async function CalendarPage({ searchParams }) {
   const { date } = await searchParams;
@@ -18,8 +19,19 @@ export default async function CalendarPage({ searchParams }) {
     );
   }
 
+  // טווח שליפה מוגבל — חצי שנה אחורה/קדימה מהיום — כדי שה-payload לא יגדל ללא
+  // הגבלה עם הזמן. אותם גבולות מועברים ל-Calendar כדי שהודעת "מעבר לטווח"
+  // תמיד תואמת בדיוק למה שבאמת נשלף, לא מחושבת בנפרד בצד הלקוח.
+  const rangeStart = monthsFromToday(-6);
+  const rangeEnd = monthsFromToday(6);
+
   const [sessionsRes, traineesRes, groupsRes] = await Promise.all([
-    supabase.from('sessions').select('id, trainee_id, group_id, date, summary').eq('coach_id', user.id),
+    supabase
+      .from('sessions')
+      .select('id, trainee_id, group_id, date, summary')
+      .eq('coach_id', user.id)
+      .gte('date', rangeStart.toISOString())
+      .lte('date', rangeEnd.toISOString()),
     supabase.from('trainees').select('id, name, group_id').eq('coach_id', user.id),
     supabase.from('groups').select('id, name').eq('coach_id', user.id),
   ]);
@@ -46,7 +58,12 @@ export default async function CalendarPage({ searchParams }) {
 
   return (
     <WorkBackground>
-      <Calendar sessions={sessions} initialDate={date} />
+      <Calendar
+        sessions={sessions}
+        initialDate={date}
+        rangeStart={rangeStart.toISOString()}
+        rangeEnd={rangeEnd.toISOString()}
+      />
     </WorkBackground>
   );
 }

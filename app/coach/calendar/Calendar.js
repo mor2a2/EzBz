@@ -10,14 +10,16 @@ import {
   addDays,
   addMonths,
   buildWeekDays,
+  endOfMonth,
   formatDayLabel,
   formatMonthYear,
   formatWeekRangeLabel,
   startOfDay,
+  startOfMonth,
 } from './calendarMath';
 import './calendar.css';
 
-export default function Calendar({ sessions, initialDate }) {
+export default function Calendar({ sessions, initialDate, rangeStart, rangeEnd }) {
   const [view, setView] = useState('week');
   const [cursor, setCursor] = useState(() =>
     startOfDay(initialDate ? new Date(initialDate) : new Date())
@@ -34,6 +36,17 @@ export default function Calendar({ sessions, initialDate }) {
   }, [sessions]);
 
   const selectedSession = sessions.find((s) => s.id === selectedId) ?? null;
+
+  // "מעבר לטווח" — רלוונטי לתצוגה חודשית בלבד (ניווט בשבועי/יומי לא נגענו בו
+  // היום). משווה מול rangeStart/rangeEnd שהתקבלו מ-page.js, לא מחשב טווח
+  // עצמאי בצד הלקוח, כדי שההודעה תמיד תואמת בדיוק למה שבאמת נשלף מהשרת.
+  let outOfRangeDirection = null;
+  if (view === 'month' && rangeStart && rangeEnd) {
+    const monthEnd = endOfMonth(cursor);
+    const monthStart = startOfMonth(cursor);
+    if (monthEnd < new Date(rangeStart)) outOfRangeDirection = 'past';
+    else if (monthStart > new Date(rangeEnd)) outOfRangeDirection = 'future';
+  }
 
   function goPrev() {
     setCursor((c) => (view === 'month' ? addMonths(c, -1) : view === 'week' ? addDays(c, -7) : addDays(c, -1)));
@@ -86,7 +99,17 @@ export default function Calendar({ sessions, initialDate }) {
         </button>
       </div>
 
-      {view === 'month' && (
+      {view === 'month' && outOfRangeDirection && (
+        <div className="cal-range-notice">
+          <div className="cal-range-notice-title">הלכת רחוק מדי</div>
+          <div className="cal-range-notice-sub">
+            {outOfRangeDirection === 'future'
+              ? 'כרגע ניתן לראות עד חצי שנה קדימה.'
+              : 'כרגע ניתן לראות עד חצי שנה אחורה.'}
+          </div>
+        </div>
+      )}
+      {view === 'month' && !outOfRangeDirection && (
         <MonthView
           cursor={cursor}
           sessionsByDay={sessionsByDay}
