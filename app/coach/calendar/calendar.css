@@ -32,7 +32,7 @@
   border: none; background: transparent; cursor: pointer; border-radius: 8px; font-family: inherit;
 }
 .cal-month-cell.dim .cal-month-daynum { color: var(--work-ink-faint); opacity: 0.5; }
-.cal-month-cell.today .cal-month-daynum { background: var(--work-accent); color: #fff; }
+.cal-month-cell.is-today .cal-month-daynum { background: var(--work-accent); color: #fff; }
 .cal-month-daynum { font-size: 11.5px; color: var(--work-ink); width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
 .cal-month-dots { display: flex; gap: 2px; height: 5px; }
 
@@ -56,6 +56,9 @@
 .cal-week-past-chev { transition: transform 0.2s; }
 .cal-week-past-chev.op { transform: rotate(180deg); }
 .cal-week-past-badge { width: 6px; height: 6px; border-radius: 50%; background: var(--status-urgent); }
+
+.cal-range-notice { padding: 56px 28px; text-align: center; }
+.cal-range-notice-title { font-size: 15px; font-weight: 600; color: var(--work-ink); }
 
 /* יומי (ומשותף לשבועי) */
 .cal-sess-row {
