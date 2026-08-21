@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase-ssr';
 import WorkBackground from '../WorkBackground';
 import HeaderGrid from '../HeaderGrid';
 import MorningTabs from './MorningTabs';
+import { jerusalemDayBounds, jerusalemHourMinute } from '../calendar/calendarMath';
 import './morning.css';
 
 function getGreeting(hour) {
@@ -12,14 +13,15 @@ function getGreeting(hour) {
 
 function formatMeetingTime(dateStr, now) {
   const d = new Date(dateStr);
-  const timeLabel = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  const { hour, minute } = jerusalemHourMinute(d);
+  const timeLabel = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
   const diffMin = Math.round((d - now) / 60000);
   const subTimeLabel =
     diffMin > 0 && diffMin < 180
       ? `עוד ${diffMin} ד׳`
-      : d.getHours() < 12
+      : hour < 12
         ? 'בוקר'
-        : d.getHours() < 17
+        : hour < 17
           ? 'אחה"צ'
           : 'ערב';
   return { timeLabel, subTimeLabel };
@@ -44,16 +46,15 @@ export default async function MorningPage() {
   const { data: coach } = await supabase.from('coaches').select('name').eq('id', user.id).single();
 
   const now = new Date();
-  const dayStart = new Date(now);
-  dayStart.setHours(0, 0, 0, 0);
-  const dayEnd = new Date(now);
-  dayEnd.setHours(23, 59, 59, 999);
+  const { start: dayStart, end: dayEnd } = jerusalemDayBounds(now);
 
   const [sessionsRes, toCollectRes, toReceiptRes, toPayRes, missingSummariesRes, missingPlansRes] =
     await Promise.all([
       supabase
         .from('sessions')
-        .select('id, date, trainees(name, group_type, progress_stages(stage_number, name, status))')
+        .select(
+          'id, date, trainee_id, group_id, trainees(name, progress_stages(stage_number, name, status)), groups(name)'
+        )
         .eq('coach_id', user.id)
         .gte('date', dayStart.toISOString())
         .lte('date', dayEnd.toISOString())
@@ -78,7 +79,7 @@ export default async function MorningPage() {
         .in('status', ['pending', 'overdue']),
       supabase
         .from('sessions')
-        .select('id, date, trainees(name)')
+        .select('id, date, trainee_id, group_id, trainees(name), groups(name)')
         .eq('coach_id', user.id)
         .is('summary', null)
         .lte('date', now.toISOString())
@@ -94,14 +95,23 @@ export default async function MorningPage() {
 
   const meetings = (sessionsRes.data ?? []).map((s) => {
     const { timeLabel, subTimeLabel } = formatMeetingTime(s.date, now);
+    const isGroup = !!s.group_id;
+    if (isGroup) {
+      return {
+        id: s.id,
+        timeLabel,
+        subTimeLabel,
+        traineeName: s.groups?.name ?? '—',
+        subLabel: 'ליווי קבוצתי',
+      };
+    }
     const activeStage = s.trainees?.progress_stages?.find((st) => st.status === 'active');
-    const groupLabel = s.trainees?.group_type === 'group' ? 'ליווי קבוצתי' : 'ליווי אישי';
     return {
       id: s.id,
       timeLabel,
       subTimeLabel,
       traineeName: s.trainees?.name ?? '—',
-      subLabel: activeStage ? `${groupLabel} · שלב ${activeStage.stage_number}` : groupLabel,
+      subLabel: activeStage ? `ליווי אישי · שלב ${activeStage.stage_number}` : 'ליווי אישי',
     };
   });
 
@@ -133,9 +143,10 @@ export default async function MorningPage() {
 
   const missingSummaries = (missingSummariesRes.data ?? []).map((row) => {
     const daysAgo = Math.floor((now - new Date(row.date)) / 86400000);
+    const traineeName = row.group_id ? (row.groups?.name ?? '—') : (row.trainees?.name ?? '—');
     return {
       id: row.id,
-      traineeName: row.trainees?.name ?? '—',
+      traineeName,
       subLabel: daysAgo <= 0 ? 'מפגש מהיום' : `מפגש מ-${daysAgo} ימים`,
     };
   });
@@ -146,8 +157,9 @@ export default async function MorningPage() {
     subLabel: `שלב פעיל: ${row.name}`,
   }));
 
-  const greeting = getGreeting(now.getHours());
+  const greeting = getGreeting(jerusalemHourMinute(now).hour);
   const dateLabel = new Intl.DateTimeFormat('he-IL', {
+    timeZone: 'Asia/Jerusalem',
     weekday: 'long',
     day: 'numeric',
     month: 'long',
