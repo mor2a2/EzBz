@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase-ssr';
 import WorkBackground from '../WorkBackground';
 import HeaderGrid from '../HeaderGrid';
 import MorningTabs from './MorningTabs';
+import { jerusalemDayBounds } from '../calendar/calendarMath';
 import './morning.css';
 
 function getGreeting(hour) {
@@ -44,16 +45,15 @@ export default async function MorningPage() {
   const { data: coach } = await supabase.from('coaches').select('name').eq('id', user.id).single();
 
   const now = new Date();
-  const dayStart = new Date(now);
-  dayStart.setHours(0, 0, 0, 0);
-  const dayEnd = new Date(now);
-  dayEnd.setHours(23, 59, 59, 999);
+  const { start: dayStart, end: dayEnd } = jerusalemDayBounds(now);
 
   const [sessionsRes, toCollectRes, toReceiptRes, toPayRes, missingSummariesRes, missingPlansRes] =
     await Promise.all([
       supabase
         .from('sessions')
-        .select('id, date, trainees(name, group_type, progress_stages(stage_number, name, status))')
+        .select(
+          'id, date, trainee_id, group_id, trainees(name, progress_stages(stage_number, name, status)), groups(name)'
+        )
         .eq('coach_id', user.id)
         .gte('date', dayStart.toISOString())
         .lte('date', dayEnd.toISOString())
@@ -94,14 +94,23 @@ export default async function MorningPage() {
 
   const meetings = (sessionsRes.data ?? []).map((s) => {
     const { timeLabel, subTimeLabel } = formatMeetingTime(s.date, now);
+    const isGroup = !!s.group_id;
+    if (isGroup) {
+      return {
+        id: s.id,
+        timeLabel,
+        subTimeLabel,
+        traineeName: s.groups?.name ?? '—',
+        subLabel: 'ליווי קבוצתי',
+      };
+    }
     const activeStage = s.trainees?.progress_stages?.find((st) => st.status === 'active');
-    const groupLabel = s.trainees?.group_type === 'group' ? 'ליווי קבוצתי' : 'ליווי אישי';
     return {
       id: s.id,
       timeLabel,
       subTimeLabel,
       traineeName: s.trainees?.name ?? '—',
-      subLabel: activeStage ? `${groupLabel} · שלב ${activeStage.stage_number}` : groupLabel,
+      subLabel: activeStage ? `ליווי אישי · שלב ${activeStage.stage_number}` : 'ליווי אישי',
     };
   });
 

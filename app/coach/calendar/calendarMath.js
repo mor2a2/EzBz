@@ -37,6 +37,35 @@ export function startOfMonth(d) {
   return new Date(d.getFullYear(), d.getMonth(), 1);
 }
 
+// אופסט UTC↔ישראל (כולל שעון קיץ) לרגע נתון, במילישניות.
+function jerusalemOffsetMs(instant) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Jerusalem',
+      hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(instant).map((p) => [p.type, p.value])
+  );
+  const asUTC = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+  return asUTC - instant.getTime();
+}
+
+// תחילת/סוף "היום" לפי השעון בישראל, ללא תלות באיזור הזמן של התהליך שמריץ את
+// הקוד (בפרודקשן על Vercel זה כברירת מחדל UTC, לא ישראל). לשימוש בצד שרת
+// בלבד — startOfDay למעלה כבר רץ בדפדפן של המשתמש, בשעון המקומי האמיתי שלו.
+export function jerusalemDayBounds(now = new Date()) {
+  const offsetMs = jerusalemOffsetMs(now);
+  const shifted = new Date(now.getTime() + offsetMs);
+  const y = shifted.getUTCFullYear();
+  const m = shifted.getUTCMonth();
+  const d = shifted.getUTCDate();
+  return {
+    start: new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - offsetMs),
+    end: new Date(Date.UTC(y, m, d, 23, 59, 59, 999) - offsetMs),
+  };
+}
+
 export function endOfMonth(d) {
   return new Date(d.getFullYear(), d.getMonth() + 1, 0);
 }
