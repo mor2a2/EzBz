@@ -37,8 +37,9 @@ export function startOfMonth(d) {
   return new Date(d.getFullYear(), d.getMonth(), 1);
 }
 
-// אופסט UTC↔ישראל (כולל שעון קיץ) לרגע נתון, במילישניות.
-function jerusalemOffsetMs(instant) {
+// שדות תאריך/שעה כפי שהם נראים בישראל (Asia/Jerusalem) עבור רגע נתון, ללא
+// תלות באיזור הזמן של התהליך שמריץ את הקוד.
+function jerusalemParts(instant) {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat('en-US', {
       timeZone: 'Asia/Jerusalem',
@@ -47,7 +48,20 @@ function jerusalemOffsetMs(instant) {
       hour: '2-digit', minute: '2-digit', second: '2-digit',
     }).formatToParts(instant).map((p) => [p.type, p.value])
   );
-  const asUTC = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+  return {
+    year: Number(parts.year),
+    month: Number(parts.month),
+    day: Number(parts.day),
+    hour: Number(parts.hour),
+    minute: Number(parts.minute),
+    second: Number(parts.second),
+  };
+}
+
+// אופסט UTC↔ישראל (כולל שעון קיץ) לרגע נתון, במילישניות.
+function jerusalemOffsetMs(instant) {
+  const p = jerusalemParts(instant);
+  const asUTC = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
   return asUTC - instant.getTime();
 }
 
@@ -64,6 +78,14 @@ export function jerusalemDayBounds(now = new Date()) {
     start: new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - offsetMs),
     end: new Date(Date.UTC(y, m, d, 23, 59, 59, 999) - offsetMs),
   };
+}
+
+// שעה:דקה כפי שהם נראים בישראל, ללא תלות באיזור הזמן של התהליך שמריץ את
+// הקוד. לשימוש בצד שרת בלבד — formatTime למעלה כבר רץ בצד לקוח, בשעון
+// האמיתי של המשתמש.
+export function jerusalemHourMinute(d) {
+  const { hour, minute } = jerusalemParts(d);
+  return { hour, minute };
 }
 
 export function endOfMonth(d) {

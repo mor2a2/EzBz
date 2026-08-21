@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase-ssr';
 import WorkBackground from '../WorkBackground';
 import HeaderGrid from '../HeaderGrid';
 import MorningTabs from './MorningTabs';
-import { jerusalemDayBounds } from '../calendar/calendarMath';
+import { jerusalemDayBounds, jerusalemHourMinute } from '../calendar/calendarMath';
 import './morning.css';
 
 function getGreeting(hour) {
@@ -13,14 +13,15 @@ function getGreeting(hour) {
 
 function formatMeetingTime(dateStr, now) {
   const d = new Date(dateStr);
-  const timeLabel = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  const { hour, minute } = jerusalemHourMinute(d);
+  const timeLabel = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
   const diffMin = Math.round((d - now) / 60000);
   const subTimeLabel =
     diffMin > 0 && diffMin < 180
       ? `עוד ${diffMin} ד׳`
-      : d.getHours() < 12
+      : hour < 12
         ? 'בוקר'
-        : d.getHours() < 17
+        : hour < 17
           ? 'אחה"צ'
           : 'ערב';
   return { timeLabel, subTimeLabel };
@@ -78,7 +79,7 @@ export default async function MorningPage() {
         .in('status', ['pending', 'overdue']),
       supabase
         .from('sessions')
-        .select('id, date, trainees(name)')
+        .select('id, date, trainee_id, group_id, trainees(name), groups(name)')
         .eq('coach_id', user.id)
         .is('summary', null)
         .lte('date', now.toISOString())
@@ -142,9 +143,10 @@ export default async function MorningPage() {
 
   const missingSummaries = (missingSummariesRes.data ?? []).map((row) => {
     const daysAgo = Math.floor((now - new Date(row.date)) / 86400000);
+    const traineeName = row.group_id ? (row.groups?.name ?? '—') : (row.trainees?.name ?? '—');
     return {
       id: row.id,
-      traineeName: row.trainees?.name ?? '—',
+      traineeName,
       subLabel: daysAgo <= 0 ? 'מפגש מהיום' : `מפגש מ-${daysAgo} ימים`,
     };
   });
@@ -155,8 +157,9 @@ export default async function MorningPage() {
     subLabel: `שלב פעיל: ${row.name}`,
   }));
 
-  const greeting = getGreeting(now.getHours());
+  const greeting = getGreeting(jerusalemHourMinute(now).hour);
   const dateLabel = new Intl.DateTimeFormat('he-IL', {
+    timeZone: 'Asia/Jerusalem',
     weekday: 'long',
     day: 'numeric',
     month: 'long',
