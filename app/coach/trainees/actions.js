@@ -72,6 +72,57 @@ export async function createTrainee({ name, area, groupId }) {
   return { ok: true };
 }
 
+export async function updateTraineeDetails(traineeId, fields) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'לא מחובר/ת' };
+
+  const { error } = await supabase
+    .from('trainees')
+    .update({
+      age: fields.age === '' || fields.age == null ? null : Number(fields.age),
+      phone: fields.phone?.trim() || null,
+      note: fields.note?.trim() || null,
+      parent_name: fields.parentName?.trim() || null,
+      parent_phone: fields.parentPhone?.trim() || null,
+      area: fields.area?.trim() || null,
+      group_type: fields.groupType,
+      parent_consent: fields.parentConsent,
+      parent_consent_date: fields.parentConsentDate || null,
+      start_date: fields.startDate || null,
+    })
+    .eq('id', traineeId)
+    .eq('coach_id', user.id);
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/coach/trainees/${traineeId}`);
+  revalidatePath('/coach/trainees');
+  return { ok: true };
+}
+
+export async function addTraineePayment({ traineeId, dueDate, amount }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'לא מחובר/ת' };
+  if (!dueDate) return { error: 'תאריך הוא שדה חובה' };
+  const amountNum = Number(amount);
+  if (!amountNum || amountNum <= 0) return { error: 'סכום לא תקין' };
+
+  const { error } = await supabase
+    .from('trainee_payments')
+    .insert({ coach_id: user.id, trainee_id: traineeId, due_date: dueDate, amount: amountNum });
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/coach/trainees/${traineeId}`);
+  return { ok: true };
+}
+
 export async function assignTraineeToGroup(traineeId, groupId) {
   const supabase = await createClient();
   const {

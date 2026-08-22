@@ -120,10 +120,12 @@
 .tr-field { margin-bottom: 10px; }
 .tr-field label { font-size: 10px; color: var(--work-ink-faint); display: block; margin-bottom: 3px; }
 .tr-field input,
-.tr-field select {
+.tr-field select,
+.tr-field textarea {
   width: 100%; border: 0.5px solid var(--work-card-border); border-radius: 8px; padding: 7px 10px;
   font-size: 12px; background: #fff; color: var(--work-ink); outline: none; font-family: inherit;
 }
+.tr-field textarea { resize: vertical; line-height: 1.4; }
 
 .tr-autocomplete { position: relative; }
 .tr-autocomplete-list {

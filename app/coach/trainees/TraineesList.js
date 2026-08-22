@@ -10,7 +10,6 @@ import {
   IconCalendarEvent,
   IconPlus,
   IconUserPlus,
-  IconX,
   IconSearch,
   IconMapPin,
   IconUser,
@@ -19,7 +18,10 @@ import {
   IconBrandWhatsapp,
 } from '@tabler/icons-react';
 import HeaderGrid from '../HeaderGrid';
-import { markIncomeReceived, createGroup, createTrainee, assignTraineeToGroup } from './actions';
+import Sheet from './Sheet';
+import CityAutocomplete from './CityAutocomplete';
+import AssignGroupSheet from './AssignGroupSheet';
+import { markIncomeReceived, createGroup, createTrainee } from './actions';
 
 function initials(name) {
   return name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join('');
@@ -43,7 +45,7 @@ function coordinatorWaLink(coordinator) {
 
 function Actions({ trainee }) {
   const [isPending, startTransition] = useTransition();
-  const wa = waLink(trainee.parentPhone, trainee.name);
+  const wa = waLink(trainee.phone || trainee.parentPhone, trainee.name);
 
   return (
     <div className="tr-qa">
@@ -102,21 +104,6 @@ function TraineeRow({ trainee, onAssign }) {
         </div>
       </div>
       <Actions trainee={trainee} />
-    </div>
-  );
-}
-
-function Sheet({ title, onClose, children }) {
-  return (
-    <div className="tr-overlay" onClick={onClose}>
-      <div className="tr-sheet" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="tr-sheet-close" onClick={onClose}>
-          <IconX size={16} />
-        </button>
-        <div className="tr-sheet-handle" />
-        <div className="tr-sheet-title">{title}</div>
-        {children}
-      </div>
     </div>
   );
 }
@@ -182,59 +169,6 @@ function CreateGroupSheet({ trainees, onClose }) {
   );
 }
 
-function CityAutocomplete({ value, onChange, suggestions }) {
-  const [open, setOpen] = useState(false);
-  // null = show the full list (on focus, before the user actively types anything new).
-  // string = the user is typing — narrow the list to match it, same as a normal autocomplete.
-  const [filterText, setFilterText] = useState(null);
-
-  const filtered = useMemo(() => {
-    if (filterText === null) return suggestions;
-    const q = filterText.trim();
-    return q ? suggestions.filter((s) => s.city.includes(q)) : suggestions;
-  }, [suggestions, filterText]);
-
-  return (
-    <div className="tr-autocomplete">
-      <input
-        type="text"
-        placeholder="הקלד או בחר עיר..."
-        value={value}
-        onChange={(e) => {
-          onChange(e.target.value);
-          setFilterText(e.target.value);
-          setOpen(true);
-        }}
-        onFocus={() => {
-          setOpen(true);
-          setFilterText(null);
-        }}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
-      />
-      {open && filtered.length > 0 && (
-        <div className="tr-autocomplete-list">
-          {filtered.map(({ city, hasCoordinator }) => (
-            <button
-              type="button"
-              key={city}
-              className="tr-autocomplete-option"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                onChange(city);
-                setFilterText(null);
-                setOpen(false);
-              }}
-            >
-              <span>{city}</span>
-              {hasCoordinator && <span className="tr-autocomplete-badge">יש רכז</span>}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function CreateTraineeSheet({ groups, citySuggestions, initialArea, onClose }) {
   const [name, setName] = useState('');
   const [area, setArea] = useState(initialArea || '');
@@ -279,41 +213,6 @@ function CreateTraineeSheet({ groups, citySuggestions, initialArea, onClose }) {
       <button type="button" className="tr-save-btn" disabled={isPending} onClick={save}>
         {isPending ? 'שומר...' : 'שמור מתאמן'}
       </button>
-    </Sheet>
-  );
-}
-
-function AssignGroupSheet({ trainee, groups, onClose }) {
-  const [error, setError] = useState(null);
-  const [isPending, startTransition] = useTransition();
-
-  function assign(groupId) {
-    setError(null);
-    startTransition(async () => {
-      const res = await assignTraineeToGroup(trainee.id, groupId);
-      if (res?.error) setError(res.error);
-      else onClose();
-    });
-  }
-
-  return (
-    <Sheet title={`שייך את ${trainee.name} לקבוצה`} onClose={onClose}>
-      {groups.length === 0 && <div className="tr-member-empty">אין עדיין קבוצות — צרי קבוצה חדשה קודם</div>}
-      <div className="tr-members-select">
-        {groups.map((g) => (
-          <button
-            type="button"
-            key={g.id}
-            className="tr-assign-option"
-            disabled={isPending}
-            onClick={() => assign(g.id)}
-          >
-            <IconUsers size={13} />
-            {g.name}
-          </button>
-        ))}
-      </div>
-      {error && <div className="tr-sheet-error">{error}</div>}
     </Sheet>
   );
 }

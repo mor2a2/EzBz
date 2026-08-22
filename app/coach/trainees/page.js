@@ -33,7 +33,7 @@ export default async function TraineesPage({ searchParams }) {
 
   const [groupsRes, trainRes, pendingIncomeRes, upcomingSessionsRes, coordinatorsRes] = await Promise.all([
     supabase.from('groups').select('id, name, schedule_label').eq('coach_id', user.id),
-    supabase.from('trainees').select('id, name, area, group_id, parent_phone').eq('coach_id', user.id),
+    supabase.from('trainees').select('id, name, area, group_id, phone, parent_phone').eq('coach_id', user.id),
     supabase
       .from('income')
       .select('id, trainee_id, date')
@@ -71,6 +71,7 @@ export default async function TraineesPage({ searchParams }) {
       area: t.area,
       groupId: t.group_id,
       groupName: t.group_id ? groupById[t.group_id]?.name : null,
+      phone: t.phone,
       parentPhone: t.parent_phone,
       pendingIncomeId: pending[0]?.id ?? null,
       nextSessionLabel: formatNextSession(nextSessionByTrainee[t.id], now),
