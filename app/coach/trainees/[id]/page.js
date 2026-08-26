@@ -23,33 +23,7 @@ export default async function TraineeCardPage({ params }) {
 
   const now = new Date();
 
-  const [traineeRes, groupsRes, progressRes, paymentsRes, nextSessionRes, coordinatorsRes, allAreasRes] =
-    await Promise.all([
-      supabase.from('trainees').select('*').eq('id', id).eq('coach_id', user.id).single(),
-      supabase.from('groups').select('id, name').eq('coach_id', user.id),
-      supabase
-        .from('progress_stages')
-        .select('stage_number, name, status, has_notes, has_plan')
-        .eq('trainee_id', id)
-        .eq('coach_id', user.id),
-      supabase
-        .from('trainee_payments')
-        .select('id, due_date, amount, status')
-        .eq('trainee_id', id)
-        .eq('coach_id', user.id)
-        .order('due_date', { ascending: true }),
-      supabase
-        .from('sessions')
-        .select('id, date')
-        .eq('trainee_id', id)
-        .eq('coach_id', user.id)
-        .gte('date', now.toISOString())
-        .order('date', { ascending: true })
-        .limit(1),
-      supabase.from('coordinators').select('region').order('region'),
-      supabase.from('trainees').select('area').eq('coach_id', user.id),
-    ]);
-
+  const traineeRes = await supabase.from('trainees').select('*').eq('id', id).eq('coach_id', user.id).single();
   const trainee = traineeRes.data;
   if (!trainee) {
     return (
@@ -58,6 +32,35 @@ export default async function TraineeCardPage({ params }) {
       </WorkBackground>
     );
   }
+
+  const nextSessionFilter = trainee.group_id
+    ? `trainee_id.eq.${id},group_id.eq.${trainee.group_id}`
+    : `trainee_id.eq.${id}`;
+
+  const [groupsRes, progressRes, paymentsRes, nextSessionRes, coordinatorsRes, allAreasRes] = await Promise.all([
+    supabase.from('groups').select('id, name').eq('coach_id', user.id),
+    supabase
+      .from('progress_stages')
+      .select('stage_number, name, status, has_notes, has_plan')
+      .eq('trainee_id', id)
+      .eq('coach_id', user.id),
+    supabase
+      .from('trainee_payments')
+      .select('id, due_date, amount, status')
+      .eq('trainee_id', id)
+      .eq('coach_id', user.id)
+      .order('due_date', { ascending: true }),
+    supabase
+      .from('sessions')
+      .select('id, date')
+      .eq('coach_id', user.id)
+      .or(nextSessionFilter)
+      .gte('date', now.toISOString())
+      .order('date', { ascending: true })
+      .limit(1),
+    supabase.from('coordinators').select('region').order('region'),
+    supabase.from('trainees').select('area').eq('coach_id', user.id),
+  ]);
 
   const groups = groupsRes.data ?? [];
   const groupName = trainee.group_id ? (groups.find((g) => g.id === trainee.group_id)?.name ?? null) : null;

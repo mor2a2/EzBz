@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase-ssr';
 import { revalidatePath } from 'next/cache';
+import { jerusalemInstant } from '../calendar/calendarMath';
 
 export async function markIncomeReceived(incomeId) {
   const supabase = await createClient();
@@ -120,6 +121,34 @@ export async function addTraineePayment({ traineeId, dueDate, amount }) {
   if (error) return { error: error.message };
 
   revalidatePath(`/coach/trainees/${traineeId}`);
+  return { ok: true };
+}
+
+export async function createSession({ traineeId, groupId, date, time }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'לא מחובר/ת' };
+  if (!traineeId && !groupId) return { error: 'חסר מתאמן/קבוצה' };
+  if (!date || !time) return { error: 'תאריך ושעה הם שדה חובה' };
+
+  const [year, month, day] = date.split('-').map(Number);
+  const [hour, minute] = time.split(':').map(Number);
+  const instant = jerusalemInstant(year, month, day, hour, minute);
+  if (Number.isNaN(instant.getTime())) return { error: 'תאריך/שעה לא תקינים' };
+
+  const { error } = await supabase.from('sessions').insert({
+    coach_id: user.id,
+    trainee_id: traineeId || null,
+    group_id: traineeId ? null : groupId,
+    date: instant.toISOString(),
+  });
+
+  if (error) return { error: error.message };
+
+  if (traineeId) revalidatePath(`/coach/trainees/${traineeId}`);
+  revalidatePath('/coach/calendar');
   return { ok: true };
 }
 

@@ -11,9 +11,10 @@
 }
 
 .tc-meet-pill {
-  margin-top: 8px; display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; display: flex; align-items: center; justify-content: space-between; width: 100%;
   background: rgba(255, 255, 255, 0.12); border: 0.5px solid rgba(255, 255, 255, 0.3);
   border-radius: 7px; padding: 6px 10px; text-decoration: none;
+  font-family: inherit; font-size: inherit; cursor: pointer;
 }
 .tc-meet-pill.none { justify-content: center; gap: 6px; border-style: dashed; color: var(--header-grid-stroke); }
 .tc-meet-main { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #fff; }

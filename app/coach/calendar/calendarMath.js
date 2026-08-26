@@ -92,6 +92,15 @@ export function endOfMonth(d) {
   return new Date(d.getFullYear(), d.getMonth() + 1, 0);
 }
 
+// הופך שדות שעון-קיר בישראל (Y/M/D/H/Min) לרגע UTC נכון, ללא תלות באיזור
+// הזמן של התהליך שמריץ את הקוד. לשימוש בצד שרת בלבד, כשמשתמש/ת הזינו
+// תאריך+שעה בטופס (למשל קביעת מפגש) שאמורים להתפרש כשעון ישראל.
+export function jerusalemInstant(year, month, day, hour, minute) {
+  const roughGuess = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
+  const offsetMs = jerusalemOffsetMs(roughGuess);
+  return new Date(Date.UTC(year, month - 1, day, hour, minute, 0) - offsetMs);
+}
+
 export function buildWeekDays(cursor) {
   const start = startOfWeek(cursor);
   return Array.from({ length: 7 }, (_, i) => addDays(start, i));

@@ -17,6 +17,7 @@ import HeaderGrid from '../../HeaderGrid';
 import AssignGroupSheet from '../AssignGroupSheet';
 import EditDetailsSheet from './EditDetailsSheet';
 import AddPaymentSheet from './AddPaymentSheet';
+import AddSessionSheet from './AddSessionSheet';
 import { currentStageNumber, stageWindow } from '../progressStages';
 import { formatDayLabel, formatTime, toLocalDateParam } from '../../calendar/calendarMath';
 
@@ -54,6 +55,7 @@ export default function TraineeCard({ trainee, groups, citySuggestions, stages, 
   const [showEditSheet, setShowEditSheet] = useState(false);
   const [showAssignSheet, setShowAssignSheet] = useState(false);
   const [showAddPaymentSheet, setShowAddPaymentSheet] = useState(false);
+  const [showAddSessionSheet, setShowAddSessionSheet] = useState(false);
 
   function toggleSection(name) {
     setOpenSection((prev) => (prev === name ? null : name));
@@ -93,10 +95,10 @@ export default function TraineeCard({ trainee, groups, citySuggestions, stages, 
               <span className="tc-meet-cta">צפה בפגישה ↗</span>
             </Link>
           ) : (
-            <Link href="/coach/calendar" className="tc-meet-pill none">
+            <button type="button" className="tc-meet-pill none" onClick={() => setShowAddSessionSheet(true)}>
               <IconCalendarPlus size={13} />
               <span>+ קבע פגישה</span>
-            </Link>
+            </button>
           )}
         </div>
       </div>
@@ -248,6 +250,13 @@ export default function TraineeCard({ trainee, groups, citySuggestions, stages, 
       )}
       {showAddPaymentSheet && (
         <AddPaymentSheet traineeId={trainee.id} onClose={() => setShowAddPaymentSheet(false)} />
+      )}
+      {showAddSessionSheet && (
+        <AddSessionSheet
+          traineeId={trainee.groupId ? null : trainee.id}
+          groupId={trainee.groupId || null}
+          onClose={() => setShowAddSessionSheet(false)}
+        />
       )}
     </div>
   );
