@@ -4,7 +4,7 @@ import Calendar from './Calendar';
 import { monthsFromToday } from './calendarMath';
 
 export default async function CalendarPage({ searchParams }) {
-  const { date } = await searchParams;
+  const { date, traineeId } = await searchParams;
 
   const supabase = await createClient();
   const {
@@ -56,6 +56,8 @@ export default async function CalendarPage({ searchParams }) {
     };
   });
 
+  const backToTrainee = traineeId && traineeById[traineeId] ? { id: traineeId, name: traineeById[traineeId].name } : null;
+
   return (
     <WorkBackground>
       <Calendar
@@ -63,6 +65,7 @@ export default async function CalendarPage({ searchParams }) {
         initialDate={date}
         rangeStart={rangeStart.toISOString()}
         rangeEnd={rangeEnd.toISOString()}
+        backToTrainee={backToTrainee}
       />
     </WorkBackground>
   );

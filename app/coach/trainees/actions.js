@@ -124,6 +124,40 @@ export async function addTraineePayment({ traineeId, dueDate, amount }) {
   return { ok: true };
 }
 
+export async function checkSessionConflict({ date, time }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !date || !time) return { conflict: null };
+
+  const [year, month, day] = date.split('-').map(Number);
+  const [hour, minute] = time.split(':').map(Number);
+  const instant = jerusalemInstant(year, month, day, hour, minute);
+  if (Number.isNaN(instant.getTime())) return { conflict: null };
+
+  const { data } = await supabase
+    .from('sessions')
+    .select('trainee_id, group_id')
+    .eq('coach_id', user.id)
+    .eq('date', instant.toISOString())
+    .limit(1);
+
+  const existing = data?.[0];
+  if (!existing) return { conflict: null };
+
+  let name = null;
+  if (existing.trainee_id) {
+    const { data: t } = await supabase.from('trainees').select('name').eq('id', existing.trainee_id).single();
+    name = t?.name ?? null;
+  } else if (existing.group_id) {
+    const { data: g } = await supabase.from('groups').select('name').eq('id', existing.group_id).single();
+    name = g?.name ?? null;
+  }
+
+  return { conflict: name ? { name } : null };
+}
+
 export async function createSession({ traineeId, groupId, date, time }) {
   const supabase = await createClient();
   const {
@@ -137,6 +171,7 @@ export async function createSession({ traineeId, groupId, date, time }) {
   const [hour, minute] = time.split(':').map(Number);
   const instant = jerusalemInstant(year, month, day, hour, minute);
   if (Number.isNaN(instant.getTime())) return { error: 'תאריך/שעה לא תקינים' };
+  if (instant.getTime() < Date.now()) return { error: 'לא ניתן לקבוע מפגש בתאריך/שעה שכבר עברו' };
 
   const { error } = await supabase.from('sessions').insert({
     coach_id: user.id,

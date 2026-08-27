@@ -85,7 +85,7 @@ export default function TraineeCard({ trainee, groups, citySuggestions, stages, 
           </div>
           {nextSession ? (
             <Link
-              href={`/coach/calendar?date=${toLocalDateParam(new Date(nextSession.date))}`}
+              href={`/coach/calendar?date=${toLocalDateParam(new Date(nextSession.date))}&traineeId=${trainee.id}`}
               className="tc-meet-pill has"
             >
               <span className="tc-meet-main">

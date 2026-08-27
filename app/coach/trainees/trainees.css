@@ -158,6 +158,8 @@
 }
 .tr-save-btn:disabled { opacity: 0.6; cursor: default; }
 .tr-sheet-error { font-size: 11px; color: var(--status-urgent); margin-top: 8px; text-align: center; }
+.tr-sheet-warning { font-size: 11px; color: var(--status-pending); margin-top: 8px; text-align: center; }
+.tr-cancel-btn { margin-top: 8px; }
 
 .tr-assign-option {
   width: 100%; display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: #fff; border: none;
