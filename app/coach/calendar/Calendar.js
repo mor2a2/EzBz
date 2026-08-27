@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { IconArrowRight } from '@tabler/icons-react';
 import HeaderGrid from '../HeaderGrid';
 import MonthView from './MonthView';
 import WeekView from './WeekView';
@@ -19,7 +21,7 @@ import {
 } from './calendarMath';
 import './calendar.css';
 
-export default function Calendar({ sessions, initialDate, rangeStart, rangeEnd }) {
+export default function Calendar({ sessions, initialDate, rangeStart, rangeEnd, backToTrainee }) {
   const [view, setView] = useState('week');
   const [cursor, setCursor] = useState(() =>
     startOfDay(initialDate ? new Date(initialDate) : new Date())
@@ -70,6 +72,12 @@ export default function Calendar({ sessions, initialDate, rangeStart, rangeEnd }
       <div className="cal-hdr">
         <HeaderGrid />
         <div className="cal-hdr-content">
+          {backToTrainee && (
+            <Link href={`/coach/trainees/${backToTrainee.id}`} className="cal-back-link">
+              <IconArrowRight size={13} />
+              חזרה לכרטיס {backToTrainee.name}
+            </Link>
+          )}
           <div className="cal-hdr-greet">קלנדר</div>
           <div className="cal-hdr-title">המפגשים שלי</div>
         </div>
