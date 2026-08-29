@@ -5,18 +5,34 @@
   height: 100dvh;
   max-width: 440px;
   margin: 0 auto;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   position: relative;
-  /* מקימה containing block חדש ל-position:fixed צאצאים (TabBar, sheets) — כך שהם
-     תמיד יתייחסו למסגרת הכרטיס (440px, גובה מסך אמיתי) ולא לחלון הדפדפן הגולמי.
-     בלי זה: בדסקטופ רחב/גבוה, אלמנטים fixed "בורחים" לתחתית החלון האמיתי, רחוק
-     מהכרטיס. עם transform, position:fixed מתנהג כמו position:absolute יחסית
-     ל-.work-page עצמו — וכיוון ש-.work-page קבוע בגובה (100dvh) וגולל פנימית
-     (overflow-y:auto), זה עדיין תמיד "צמוד למסך" בדיוק כמו fixed אמיתי, רק
-     ממוסגר נכון. נבדק גם עם רשימה ארוכה (גלילה פנימית, לא רק תוכן קצר). */
+  /* מקימה containing block חדש ל-position:fixed צאצאים (TabBar, sheets, רקע ה-SVG) —
+     כך שהם תמיד יתייחסו למסגרת הכרטיס (440px, גובה מסך אמיתי) ולא לחלון הדפדפן
+     הגולמי. בלי זה: בדסקטופ רחב/גבוה, אלמנטים fixed "בורחים" לתחתית החלון האמיתי,
+     רחוק מהכרטיס.
+     קריטי: .work-page עצמו לא גולל (overflow:hidden, לא auto). הגלילה עברה ל-
+     .work-scroll הפנימי (למטה) בכוונה — תוקן 2026-08-29 אחרי שהתגלה בפועל
+     (מדידת bounding box + wheel scroll אמיתי) שההנחה הקודמת כאן הייתה שגויה:
+     "position:fixed יחסית ל-.work-page נשאר תמיד צמוד למסך גם כש-.work-page גולל
+     פנימית" — זה לא נכון. כש-transform הופך אלמנט גם לcontaining block של fixed
+     וגם הוא עצמו ה-scroll container, הצאצאים ה-fixed שלו זזים ביחד עם הגלילה
+     (בדיוק כמו position:absolute רגיל), לא נשארים "מרחפים" מעל התוכן. זה לא נתפס
+     קודם כי אף תוכן לא היה ארוך מספיק כדי לגלול עד שהבאג נראה (TabBar "בורח" כלפי
+     מעלה יחד עם הגלילה, נחשף/נחסם תוכן מתחתיו). הפתרון: .work-page לא גולל בכלל —
+     הוא רק המסגרת הקבועה; .work-scroll גולל בפנים; TabBar/sheets/רקע ה-SVG
+     ממשיכים להיות ילדים ישירים של .work-page (לא של .work-scroll), ולכן עכשיו
+     באמת נשארים קבועים ויזואלית בלי קשר לגלילה הפנימית. אומת אחרי התיקון: 0px
+     חפיפה בין TabBar לתוכן האחרון ב-B3/B5/B6, עם viewport מוקטן מלאכותית שמכריח
+     גלילה לסוף בשלושתם. */
   transform: translateZ(0);
   color: var(--work-ink);
+}
+
+.work-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .work-page a {

@@ -32,7 +32,9 @@ export default function WorkBackground({ children }) {
             ))}
           </g>
         </svg>
-        <div className="work-content">{children}</div>
+        <div className="work-scroll">
+          <div className="work-content">{children}</div>
+        </div>
         <TabBar />
       </div>
     </>
