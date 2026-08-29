@@ -100,7 +100,6 @@ export default async function TraineeCardPage({ params }) {
           groupId: trainee.group_id,
           groupName,
           note: trainee.note,
-          groupType: trainee.group_type,
         }}
         groups={groups}
         citySuggestions={citySuggestions}

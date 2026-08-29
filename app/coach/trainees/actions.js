@@ -89,7 +89,6 @@ export async function updateTraineeDetails(traineeId, fields) {
       parent_name: fields.parentName?.trim() || null,
       parent_phone: fields.parentPhone?.trim() || null,
       area: fields.area?.trim() || null,
-      group_type: fields.groupType,
       parent_consent: fields.parentConsent,
       parent_consent_date: fields.parentConsentDate || null,
       start_date: fields.startDate || null,

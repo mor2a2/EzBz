@@ -21,8 +21,6 @@ import AddSessionSheet from './AddSessionSheet';
 import { currentStageNumber, stageWindow } from '../progressStages';
 import { formatDayLabel, formatTime, toLocalDateParam } from '../../calendar/calendarMath';
 
-const GROUP_TYPE_LABEL = { individual: 'יחיד', group: 'קבוצה' };
-
 function formatMonthYear(dateStr) {
   if (!dateStr) return '—';
   return new Intl.DateTimeFormat('he-IL', { month: 'long', year: 'numeric' }).format(new Date(dateStr));
@@ -80,7 +78,7 @@ export default function TraineeCard({ trainee, groups, citySuggestions, stages, 
           </div>
           <div className="tc-badges">
             <span className="tc-badge">{trainee.age != null ? `גיל ${trainee.age}` : 'גיל —'}</span>
-            <span className="tc-badge">{GROUP_TYPE_LABEL[trainee.groupType] ?? 'יחיד'}</span>
+            <span className="tc-badge">{trainee.groupId ? 'קבוצה' : 'יחיד'}</span>
             <span className="tc-badge">{formatMonthYear(trainee.startDate)}</span>
           </div>
           {nextSession ? (
