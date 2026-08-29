@@ -18,7 +18,6 @@ export default function EditDetailsSheet({ trainee, citySuggestions, onClose }) 
   const [parentConsent, setParentConsent] = useState(!!trainee.parentConsent);
   const [startMonth, setStartMonth] = useState(trainee.startDate ? trainee.startDate.slice(0, 7) : '');
   const [area, setArea] = useState(trainee.area ?? '');
-  const [groupType, setGroupType] = useState(trainee.groupType ?? 'individual');
   const [note, setNote] = useState(trainee.note ?? '');
   const [error, setError] = useState(null);
   const [isPending, startTransition] = useTransition();
@@ -37,7 +36,6 @@ export default function EditDetailsSheet({ trainee, citySuggestions, onClose }) 
         parentConsentDate,
         startDate: startMonth ? `${startMonth}-01` : null,
         area,
-        groupType,
         note,
       });
       if (res?.error) setError(res.error);
@@ -90,22 +88,7 @@ export default function EditDetailsSheet({ trainee, citySuggestions, onClose }) 
 
       <div className="tr-field">
         <label>סוג ליווי</label>
-        <div className="tc-toggle">
-          <button
-            type="button"
-            className={`tc-toggle-btn ${groupType === 'individual' ? 'on' : ''}`}
-            onClick={() => setGroupType('individual')}
-          >
-            יחיד
-          </button>
-          <button
-            type="button"
-            className={`tc-toggle-btn ${groupType === 'group' ? 'on' : ''}`}
-            onClick={() => setGroupType('group')}
-          >
-            קבוצה
-          </button>
-        </div>
+        <div className="tc-fv-readonly">{trainee.groupId ? 'קבוצה' : 'יחיד'}</div>
       </div>
 
       <div className="tr-field">

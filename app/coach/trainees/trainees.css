@@ -126,6 +126,10 @@
   font-size: 12px; background: #fff; color: var(--work-ink); outline: none; font-family: inherit;
 }
 .tr-field textarea { resize: vertical; line-height: 1.4; }
+.tc-fv-readonly {
+  width: 100%; border: 0.5px solid var(--work-card-border); border-radius: 8px; padding: 7px 10px;
+  font-size: 12px; background: var(--work-card-bg); color: var(--work-ink-faint); box-sizing: border-box;
+}
 
 .tr-autocomplete { position: relative; }
 .tr-autocomplete-list {
