@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase-ssr';
 import { revalidatePath } from 'next/cache';
 import { jerusalemInstant } from '../calendar/calendarMath';
+import { DEFAULT_STAGES } from './progressStages';
 
 export async function markIncomeReceived(incomeId) {
   const supabase = await createClient();
@@ -60,14 +61,32 @@ export async function createTrainee({ name, area, groupId }) {
   if (!user) return { error: 'לא מחובר/ת' };
   if (!name?.trim()) return { error: 'שם המתאמן הוא שדה חובה' };
 
-  const { error } = await supabase.from('trainees').insert({
-    coach_id: user.id,
-    name: name.trim(),
-    area: area?.trim() || null,
-    group_id: groupId || null,
-  });
+  const { data: trainee, error } = await supabase
+    .from('trainees')
+    .insert({
+      coach_id: user.id,
+      name: name.trim(),
+      area: area?.trim() || null,
+      group_id: groupId || null,
+    })
+    .select('id')
+    .single();
 
   if (error) return { error: error.message };
+
+  const { error: stagesError } = await supabase.from('progress_stages').insert(
+    DEFAULT_STAGES.map((stageName, i) => ({
+      coach_id: user.id,
+      trainee_id: trainee.id,
+      stage_number: i + 1,
+      name: stageName,
+    }))
+  );
+
+  if (stagesError) {
+    await supabase.from('trainees').delete().eq('id', trainee.id);
+    return { error: stagesError.message };
+  }
 
   revalidatePath('/coach/trainees');
   return { ok: true };
