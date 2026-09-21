@@ -1,0 +1,12 @@
+.rs-hdr { background: var(--work-accent); padding: 14px 16px; position: relative; overflow: hidden; }
+.rs-hdr-content { position: relative; z-index: 1; }
+.rs-back-btn { color: #fff; opacity: 0.9; font-size: 11px; text-decoration: none; }
+.rs-title { text-align: center; font-size: 15px; font-weight: 600; color: #fff; margin-top: 4px; }
+.rs-subtitle { text-align: center; font-size: 11px; color: rgba(255, 255, 255, 0.75); margin-top: 4px; }
+
+.rs-list { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.rs-row {
+  display: block; background: var(--work-card-bg); border: 0.5px solid var(--work-card-border);
+  border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--work-ink); text-decoration: none;
+}
+.rs-row:hover { background: var(--work-accent-pale); }

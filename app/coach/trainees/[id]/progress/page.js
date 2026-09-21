@@ -110,7 +110,7 @@ export default async function TraineeProgressPage({ params }) {
         <div className="pg-list">
           {stages.map((stage) => (
             <StageRow
-              href={`/coach/sessions/${trainee.id}?stageNumber=${stage.stageNumber}`}
+              href={`/coach/trainees/${trainee.id}/progress/${stage.stageNumber}`}
               className={`pg-row ${stage.status === 'active' ? 'active' : ''}`}
               key={stage.stageNumber}
             >

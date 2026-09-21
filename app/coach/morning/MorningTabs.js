@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 function initials(name) {
   const parts = name.trim().split(/\s+/);
@@ -104,22 +105,22 @@ export default function MorningTabs({ meetings, money, completion }) {
             <div className="m-empty">הכל מעודכן.</div>
           )}
           {completion.missingSummaries.map((row) => (
-            <div className="m-comp-row" key={row.id}>
+            <Link className="m-comp-row" href={row.href} key={row.id}>
               <div className="m-comp-info">
                 <div className="m-comp-name">{row.traineeName} — חסר סיכום מפגש</div>
                 <div className="m-comp-sub">{row.subLabel}</div>
               </div>
               <span className="m-comp-type">סיכום</span>
-            </div>
+            </Link>
           ))}
           {completion.missingPlans.map((row) => (
-            <div className="m-comp-row" key={row.id}>
+            <Link className="m-comp-row" href={row.href} key={row.id}>
               <div className="m-comp-info">
                 <div className="m-comp-name">{row.traineeName} — מערך שיעור חסר</div>
                 <div className="m-comp-sub">{row.subLabel}</div>
               </div>
               <span className="m-comp-type">מערך</span>
-            </div>
+            </Link>
           ))}
         </div>
       )}

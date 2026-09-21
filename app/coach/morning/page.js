@@ -87,7 +87,7 @@ export default async function MorningPage() {
         .limit(5),
       supabase
         .from('progress_stages')
-        .select('id, name, stage_number, trainees(name)')
+        .select('id, name, stage_number, trainee_id, trainees(name)')
         .eq('coach_id', user.id)
         .eq('has_plan', false)
         .eq('status', 'active'),
@@ -148,6 +148,7 @@ export default async function MorningPage() {
       id: row.id,
       traineeName,
       subLabel: daysAgo <= 0 ? 'מפגש מהיום' : `מפגש מ-${daysAgo} ימים`,
+      href: `/coach/sessions/${row.id}`,
     };
   });
 
@@ -155,6 +156,7 @@ export default async function MorningPage() {
     id: row.id,
     traineeName: row.trainees?.name ?? '—',
     subLabel: `שלב פעיל: ${row.name}`,
+    href: `/coach/trainees/${row.trainee_id}/progress/${row.stage_number}`,
   }));
 
   const greeting = getGreeting(jerusalemHourMinute(now).hour);
