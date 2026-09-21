@@ -1,0 +1,121 @@
+/* כותרת — שם שלב ניתן לעריכה, בתוך .pg-hdr (רקע --work-accent, טקסט לבן) */
+.sd-name-btn {
+  flex: 1; text-align: center; font-size: 15px; font-weight: 600; color: #fff;
+  background: none; border: none; font-family: inherit; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 5px; opacity: 0.95;
+}
+.sd-name-btn:hover { opacity: 1; }
+.sd-name-edit { flex: 1; display: flex; align-items: center; gap: 5px; }
+.sd-name-edit input {
+  flex: 1; border: 0.5px solid rgba(255, 255, 255, 0.4); border-radius: 6px; padding: 3px 8px;
+  font-size: 13px; background: rgba(255, 255, 255, 0.12); color: #fff; outline: none; font-family: inherit;
+}
+.sd-name-edit button {
+  background: rgba(255, 255, 255, 0.15); border: none; border-radius: 5px; color: #fff;
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+}
+
+/* "ממה המשכנו" באנר */
+.sd-banner {
+  background: var(--work-accent-pale); border-bottom: 0.5px solid var(--work-card-border); padding: 9px 16px;
+}
+.sd-banner-label { font-size: 10px; font-weight: 600; color: var(--work-accent); margin-bottom: 2px; }
+.sd-banner-text { font-size: 11.5px; color: var(--work-ink-dim); line-height: 1.4; }
+
+/* מערך שיעור — מצב ריק */
+.sd-lesson-empty { padding: 24px 16px; text-align: center; }
+.sd-empty-text { font-size: 12px; color: var(--work-ink-faint); margin-bottom: 12px; }
+.sd-lesson-empty .tr-save-btn { margin-top: 0; }
+.sd-lesson-empty .tr-addbtn { margin-top: 8px; width: 100%; }
+
+/* מערך שיעור — טופס מלא */
+.sd-lesson-form { padding: 14px 16px; }
+.sd-shared-bar {
+  display: flex; align-items: center; justify-content: space-between; background: var(--work-card-bg);
+  border: 0.5px solid var(--work-card-border); border-radius: 8px; padding: 7px 10px; margin-bottom: 12px;
+  font-size: 11px; color: var(--work-ink-faint);
+}
+.sd-shared-bar span { display: flex; align-items: center; gap: 5px; }
+.sd-shared-bar-btn {
+  font-size: 11px; color: var(--work-accent); background: var(--work-accent-pale); border: 0.5px solid var(--work-accent);
+  padding: 3px 10px; border-radius: 6px; cursor: pointer; font-family: inherit;
+}
+.sd-lesson-foot { display: flex; gap: 8px; margin-top: 4px; }
+.sd-lesson-foot .tr-save-btn,
+.sd-lesson-foot .tr-addbtn { margin-top: 0; flex: 1; }
+.sd-publish-box { margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--work-card-border); }
+
+/* מודל בחירה מהמאגר */
+.sd-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 55;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.sd-modal { background: #fff; border-radius: 12px; padding: 16px; width: 100%; max-width: 300px; }
+.sd-modal-title { font-size: 14px; font-weight: 600; color: var(--work-ink); margin-bottom: 10px; text-align: center; }
+.sd-modal-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 0; border-bottom: 0.5px solid var(--work-card-border);
+}
+.sd-modal-row:last-of-type { border-bottom: none; }
+.sd-modal-row-name { font-size: 12px; color: var(--work-ink); }
+.sd-modal-pick-btn {
+  font-size: 11px; color: var(--work-accent); background: var(--work-accent-pale); border: 0.5px solid var(--work-accent);
+  padding: 3px 10px; border-radius: 6px; cursor: pointer; flex-shrink: 0; font-family: inherit;
+}
+.sd-modal-close { display: flex; justify-content: center; margin-top: 12px; }
+.sd-modal-close button {
+  font-size: 12px; color: var(--work-ink-faint); background: transparent; border: 0.5px solid var(--work-card-border);
+  padding: 5px 16px; border-radius: 6px; cursor: pointer; font-family: inherit;
+}
+
+/* הערות מפגש */
+.sd-notes { padding: 12px 16px 20px; }
+.sd-plan-preview .sd-banner-text { font-size: 11px; }
+.sd-plan-preview-link { color: var(--work-accent); text-decoration: none; font-weight: 500; white-space: nowrap; }
+.sd-plan-preview { margin: 0 0 10px; border-radius: 8px; border: 0.5px solid var(--work-card-border); }
+
+.sn-card {
+  background: var(--work-card-bg); border-radius: 9px; padding: 9px 11px; margin-bottom: 8px;
+  border: 0.5px solid var(--work-card-border);
+}
+.sn-date { font-size: 10px; color: var(--work-ink-faint); margin-bottom: 3px; }
+.sn-text { font-size: 12px; color: var(--work-ink); line-height: 1.5; }
+.sn-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+.sn-tag { font-size: 10px; background: var(--status-pending-pale); color: var(--status-pending); padding: 1px 8px; border-radius: 20px; }
+.sn-next-note { font-size: 10px; color: var(--status-pending); margin-top: 5px; }
+
+.sd-picker { border-top: 0.5px solid var(--work-card-border); padding-top: 11px; margin-top: 4px; }
+.sd-picker-row {
+  display: block; width: 100%; text-align: right; background: var(--work-card-bg); border: 0.5px solid var(--work-card-border);
+  border-radius: 8px; padding: 9px 12px; font-size: 12px; color: var(--work-ink); cursor: pointer; margin-bottom: 6px; font-family: inherit;
+}
+.sd-picker-row:hover { background: var(--work-accent-pale); }
+
+.add-area { border-top: 0.5px solid var(--work-card-border); padding-top: 11px; margin-top: 8px; }
+.sd-chosen-date {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-size: 11px; color: var(--work-ink-dim); background: var(--work-card-bg);
+  border: 0.5px solid var(--work-card-border); border-radius: 7px; padding: 6px 10px; margin-bottom: 10px;
+}
+.sd-change-link {
+  font-size: 10.5px; color: var(--work-accent); background: none; border: none; cursor: pointer;
+  text-decoration: underline; font-family: inherit; flex-shrink: 0; padding: 0;
+}
+.add-label { font-size: 11px; font-weight: 600; color: var(--work-ink-dim); margin-bottom: 8px; }
+.mood-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.mood-btn {
+  padding: 4px 10px; border: 0.5px solid var(--work-card-border); border-radius: 20px; font-size: 11px;
+  color: var(--work-ink-faint); cursor: pointer; background: transparent; font-family: inherit;
+}
+.mood-btn.on { background: var(--work-accent-pale); border-color: var(--work-accent); color: var(--work-accent); font-weight: 500; }
+.add-area > textarea {
+  width: 100%; border: 0.5px solid var(--work-card-border); border-radius: 8px; padding: 7px 10px;
+  font-size: 12px; background: #fff; color: var(--work-ink); outline: none; font-family: inherit; resize: vertical; line-height: 1.4;
+}
+.next-field-label { font-size: 10px; font-weight: 600; color: var(--status-pending); text-transform: uppercase; letter-spacing: 0.04em; margin: 10px 0 3px; }
+.next-field {
+  width: 100%; border: 0.5px solid var(--status-pending); border-radius: 8px; padding: 7px 10px;
+  font-size: 12px; background: var(--status-pending-pale); color: var(--work-ink); outline: none; font-family: inherit;
+}
+.notes-foot { margin-top: 10px; }
+.notes-foot .tr-save-btn { margin-top: 0; }

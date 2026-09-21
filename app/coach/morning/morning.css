@@ -54,8 +54,12 @@
 .m-money-amt { font-size: 13px; font-weight: 600; color: var(--status-urgent); }
 .m-money-amt.receipt { color: var(--status-pending); }
 
-.m-comp-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid var(--work-card-border); }
+.m-comp-row {
+  display: flex; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid var(--work-card-border);
+  text-decoration: none; color: inherit;
+}
 .m-comp-row:last-child { border-bottom: none; }
+.m-comp-row:hover { background: var(--work-card-bg); }
 .m-comp-info { flex: 1; }
 .m-comp-name { font-size: 12px; font-weight: 500; }
 .m-comp-sub { font-size: 10px; color: var(--work-ink-faint); margin-top: 1px; }
