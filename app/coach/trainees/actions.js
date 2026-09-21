@@ -50,6 +50,7 @@ export async function createGroup({ name, scheduleLabel, memberIds }) {
   }
 
   revalidatePath('/coach/trainees');
+  revalidatePath('/coach/groups');
   return { ok: true };
 }
 
@@ -89,6 +90,7 @@ export async function createTrainee({ name, area, groupId }) {
   }
 
   revalidatePath('/coach/trainees');
+  revalidatePath('/coach/groups');
   return { ok: true };
 }
 
