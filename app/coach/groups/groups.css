@@ -1,0 +1,27 @@
+/* רשימת קבוצות: כרטיס קבוצה כקישור */
+.tr-root .gr-gcard { display: block; text-decoration: none; color: inherit; }
+.tr-root .gr-gcard:hover { background: var(--work-accent-pale); }
+.gr-chev { color: var(--work-ink-faint); flex-shrink: 0; }
+.gr-gcard-sub {
+  display: flex; align-items: center; gap: 6px; padding: 0 12px 9px;
+  font-size: 10px; color: var(--work-ink-faint);
+}
+
+/* רשימת קבוצות: מתאמנים ללא קבוצה ותוצאות חיפוש, כשורות-קישור */
+.gr-section-label { font-size: 10px; color: var(--work-ink-faint); margin: 12px 16px 2px; }
+.gr-list {
+  margin: 6px 12px; background: var(--work-card-bg); border-radius: 10px;
+  border: 0.5px solid var(--work-card-border); overflow: hidden;
+}
+.gr-list .tr-row:first-child { border-top: none; }
+.tr-root .gr-row { text-decoration: none; color: inherit; }
+.tr-root .gr-row:hover { background: var(--work-accent-pale); }
+
+/* מסך 12 השלבים של קבוצה */
+.pg-hdr .gr-back { color: #fff; opacity: 0.9; font-size: 11px; text-decoration: none; }
+.gr-members-line {
+  padding: 10px 16px; font-size: 11px; color: var(--work-ink-faint);
+  background: var(--work-card-bg); border-bottom: 0.5px solid var(--work-card-border);
+}
+.pg-row.gr-static { cursor: default; }
+.pg-row.gr-static:hover { background: transparent; }

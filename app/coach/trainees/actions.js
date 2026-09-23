@@ -121,6 +121,7 @@ export async function updateTraineeDetails(traineeId, fields) {
 
   revalidatePath(`/coach/trainees/${traineeId}`);
   revalidatePath('/coach/trainees');
+  revalidatePath('/coach/groups');
   return { ok: true };
 }
 
@@ -223,5 +224,6 @@ export async function assignTraineeToGroup(traineeId, groupId) {
   if (error) return { error: error.message };
 
   revalidatePath('/coach/trainees');
+  revalidatePath('/coach/groups');
   return { ok: true };
 }
