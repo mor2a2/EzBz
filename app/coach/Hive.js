@@ -173,7 +173,7 @@ const CELLS = [
   {
     id: 5,
     label: 'קבוצות',
-    href: '/coach/trainees?view=groups',
+    href: '/coach/groups',
     glint: [53, 52],
     wallStops: [['0%', '#EDE0B5'], ['55%', '#C89838'], ['100%', '#7C4C0C']],
     Icon: GroupsIcon,
